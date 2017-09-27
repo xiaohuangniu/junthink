@@ -1,0 +1,147 @@
+{include file="index/head" /}
+<style>.layui-input-block{margin-left: 120px;line-height: 36px;}.layui-form-label{width: 120px}.layui-elem-field{border-bottom: 0}.layui-form{width: 595px}</style>
+		<!-- 添加需要的参数 -->
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">菜单管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('menu/showlist')}">菜单列表</a></li>
+						<li class="layui-this"><a href="{:url('menu/add')}">新增一级菜单</a></li>
+					</ul>
+				</div> 
+
+
+				<div class="layui-field-box layui-form">
+					
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:120px">上级栏目</label>
+						<div class="layui-input-block" id="upd_title" >{$name}</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" >菜单名称</label>
+						<div class="layui-input-block">
+							<input class="layui-input" type="text" id="name" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" >控制器 - 方法</label>
+						<div class="layui-input-block">
+							<input class="layui-input" type="text" id="controller" style="width:200px; float: left" value="">
+							<div style="float: left; height: 40px; line-height: 40px; padding: 0 20px"> - </div>
+							<input class="layui-input" type="text" id="action" style="width:200px; float: left" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">类型</label>
+						<input type="radio" name="type" title="权限认证+菜单" value="1" checked>
+						<input type="radio" name="type" title="只作为菜单" value="2">
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">状态</label>
+						<div class="layui-input-block">
+							<input type="radio" name="status" title="开启" value="1" checked>
+							<input type="radio" name="status" title="关闭" value="2">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">请求类型</label>
+						<div class="layui-input-block">
+							<select lay-filter="aihao" name="request" id="request">
+								<option value="0">不限</option>
+								<?php
+									$model       = ['GET','POST','Ajax'];
+									foreach($model as $v){
+										echo '<option value="'.$v.'">'.$v.'</option>';
+									}
+								?>
+							</select>
+						</div>
+					</div>
+
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">备注</label>
+						<div class="layui-input-block">
+							<textarea class="layui-textarea" id="remark" rows="3" placeholder="输入备注，可为空"></textarea>
+						</div>
+					</div>
+
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">点击选择ICON</label>
+						<div class="layui-input-block" id="start_icon">
+							<i class="icon fa fa-pencil text-info-lter" title="fa fa-pencil text-info-lter"></i>
+							<i class="icon glyphicon glyphicon-stats text-primary-dk" title="glyphicon glyphicon-stats text-primary-dk"></i>
+							<i class="icon fa fa-tasks" title="fa fa-tasks"></i>
+							<i class="icon fa fa-calendar-o" title="fa fa-calendar-o"></i>
+							<i class="icon fa fa-warning" title="fa fa-warning"></i>
+							<i class="icon fa fa-tachometer" title="fa fa-tachometer"></i>
+							<i class="icon fa fa-cog" title="fa fa-cog"></i>
+						</div>
+					</div>
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">已选：</label>
+						<div class="layui-input-block" id="end_icon">
+							
+						</div>
+					</div>
+
+					<input type="hidden" id="pid" value="{$pid}">
+					
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button type="button" class="layui-btn model" id="upd_btn">新增</button>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+
+<script type="text/javascript">
+layui.use(['form', 'layedit', 'laydate'], function() {
+	var form = layui.form(),layer = layui.layer;
+	$("#start_icon i").click(function(){
+		$("#end_icon").html($(this).prop("outerHTML"));
+	});
+
+	// 点击提交
+	$("#upd_btn").click(function(){
+		var name = $('#name').val();
+		var pid  = $('#pid').val();
+		var controller  = $('#controller').val();
+		var action  = $('#action').val();
+		var type = $('input[name="type"]:checked').val();
+		var status = $('input[name="status"]:checked').val();
+		var request = $('#request').val();
+		var remark  = $('#remark').val();
+		var icon    = $('#end_icon i').attr('title');
+		var data    = {'name':name,'pid':pid,'controller':controller,'action':action,'type':type,'status':status,'request':request,'remark':remark,'icon':icon};
+
+		if (name == '' || type == '' || status == '') { return false;}
+		$.ajax({
+			type: 'post',
+			data:data,
+			url: "{:url('menu/add')}",
+			success: function(data) {
+				var array = $.parseJSON(data);
+				if(array.code == '01'){
+					layer.tips(array.msg, '#upd_btn', {tips: [4, 'red']});
+				}else{
+					layer.tips(array.msg, '#upd_btn', {tips: [2, '#78BA32']});
+					setTimeout(function(){window.location.reload();},1000); 
+				}
+			}
+		});
+	});
+	
+});
+</script>
+
+</body>
+</html>

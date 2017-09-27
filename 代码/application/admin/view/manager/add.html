@@ -1,0 +1,176 @@
+{include file="index/head" /}
+
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">管理员</legend>
+
+				<div class="layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('manager/showlist')}">管理员列表</a></li>
+						<li class="layui-this"><a href="{:url('manager/add')}">新增管理员</a></li>
+					</ul>
+				</div> 
+
+				<div class="layui-field-box layui-form gw" style="width: 300px;float: left;height: 553px;overflow-y: auto; border: 1px solid #ccc;">
+					<ul id="demo"></ul>
+				</div>
+				<div class="layui-field-box layui-form gw" style="width: 300px;float: left;height: 553px;overflow-y: auto; border: 1px solid #ccc;">
+					<ul id="demo2"></ul>
+				</div>
+
+				<div class="layui-field-box layui-form" style="position: absolute;left: 600px; width: 500px;float: left;height: 553px;padding: 30px 0 0 30px;">
+					
+					<div class="layui-form-item gw">
+						<label class="layui-form-label" style="width:100px">组织 - 岗位</label>
+						<div class="layui-input-block" id="title-1" style="margin-left: 10px; line-height: 36px;float: left">未选择</div>
+						<div class="layui-input-block" id="title-1" style="margin: 0; width:30px; line-height: 36px;float: left;text-align: center;">-</div>
+						<div class="layui-input-block" id="title-2" style="margin: 0; line-height: 36px;float: left">未选择</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">昵称</label>
+						<div class="layui-input-block">
+							<input class="layui-input" lay-verify="controller" type="text" id="nice" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">用户名</label>
+						<div class="layui-input-block">
+							<input class="layui-input" lay-verify="controller" type="text" id="name" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">密码</label>
+						<div class="layui-input-block">
+							<input class="layui-input" lay-verify="controller" type="password" id="pwd" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">手机号</label>
+						<div class="layui-input-block">
+							<input class="layui-input" lay-verify="controller" type="text" id="phone" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">状态</label>
+						<div class="layui-input-block">
+						<input type="radio" name="status" value="1" title="开启" checked>
+						<input type="radio" name="status" value="2" title="禁用">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">超级管理员</label>
+						<div class="layui-input-block">
+						<input type="radio" name="type" lay-filter="type" value="1" title="是">
+						<input type="radio" name="type" lay-filter="type" value="2" title="否" checked>
+						</div>
+					</div>
+					
+
+					<input type="hidden" id="pid" value="">
+					
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button type="button" class="layui-btn model" id="upd_btn">新增</button>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<div class="admin-table-page">
+				<div id="paged" class="page">
+				</div>
+			</div>
+		</div>
+
+<script type="text/javascript">
+layui.use(['form','tree', 'layer'], function(){
+	var layer = layui.layer,$ = layui.jquery, form = layui.form(); 
+	form.on('radio(type)', function(data){
+		if (data.value == 1 ){
+			$('.gw').css('display', 'none');
+		}else{
+			$('.gw').css('display', 'block');
+		}
+	});        
+
+	// 组织节点树
+	layui.tree({
+		elem: '#demo' //指定元素
+		,target: '_blank' 
+		,click: function(item){ //点击节点回调
+			var id   = item.id;
+			var name = item.name;
+			$('#title-1').html(name);
+
+			$.ajax({
+				type: 'post',
+				data:{'id':id, 'type':1},
+				url: "{:url('manager/add')}",
+				success: function(data) {
+					$('#demo2').html('');
+					if (data!=0) {
+						// Json必须转obj才行
+						data = eval('(' + data + ')');
+
+						// 组织节点树
+						layui.tree({
+							elem: '#demo2' //指定元素
+							,target: '_blank' 
+							,click: function(item){
+								var id   = item.id;
+								var name = item.name;
+								$('#title-2').html(name);
+								$('#pid').val(id);
+							}
+							,nodes: data //节点
+						});
+					}
+				}
+			});
+		}
+		,nodes: {$json} //节点
+	});
+});
+
+// 新增
+$("#upd_btn").click(function(){
+	var nice   = $('#nice').val();
+	var name   = $('#name').val();
+	var pwd    = $('#pwd').val();
+	var pid    = $('#pid').val();
+	var phone  = $('#phone').val();
+	var type   = $('input[name="type"]:checked').val();
+	var status = $('input[name="status"]:checked').val();
+
+	// 精确判断可自行添加
+	if (name == '' || pwd == '') {return false;}
+
+	if (type == 1) {pid = 0;} // 将岗位ID改为超级管理员
+	var data   = {'nice':nice, 'name':name, 'pwd':pwd, 'pid':pid, 'phone':phone, 'status':status, 'type':2};
+
+	$.ajax({
+		type: 'post',
+		data:data,
+		url: "{:url('manager/add')}",
+		success: function(data) {
+			var array = $.parseJSON(data);
+			if(array.code == '01'){
+				layer.tips(array.msg, '#upd_btn', {tips: [4, 'red']});
+			}else{
+				layer.tips(array.msg, '#upd_btn', {tips: [2, '#78BA32']});
+				setTimeout(function(){window.location.reload();},1000); 
+			}
+		}
+	});
+});
+
+</script>
+
+</body>
+</html>

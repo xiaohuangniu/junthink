@@ -1,0 +1,46 @@
+{include file="index/head" /}
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">角色管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li class="layui-this"><a href="{:url('role/showlist')}">角色列表</a></li>
+						{if condition="$adminController->vif('role','add')"}<li><a href="{:url('role/add')}">新增角色</a></li>{/if}
+					</ul>
+				</div> 
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table" style="margin: 0">
+						<thead>
+							<tr>
+								<th>角色名称</th>
+								<th>状态</th>
+								<th width="150">操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+							{volist name="list" id="v"}
+							<tr>
+								<td>{$v.r_name}</td>
+								<td>
+									{switch $v.r_status}
+										{case 1}开启{/case}
+										{case 2}关闭{/case}
+									{/switch}
+								</td>
+								<td>
+									{if condition="$adminController->vif('role','upd')"}<a class='layui-btn layui-btn-mini' href="upd/id/{$v.r_id}">编辑</a>{/if}
+									{if condition="$adminController->vif('role','del')"}<a class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirm('真的要删除吗?')" href="del/id/{$v.r_id}">删除</a>{/if}
+								</td>
+							</tr>
+							{/volist}
+						</tbody>
+					</table>
+					{$page}
+				</div>
+			</fieldset>
+		</div>
+
+</body>
+</html>

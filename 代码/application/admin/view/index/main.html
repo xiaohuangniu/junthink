@@ -1,0 +1,54 @@
+{include file="index/head" /}
+<style>
+	.layui-collapse{width: 30%; float: left; margin-right: 3%}
+</style>
+<div class="admin-main">
+	<blockquote class="layui-elem-quote" style="font-size: 14px">友情提示：经常查看系统日志，发现异常以便及时追查原因。</blockquote>
+
+	<div style="width: 100%">
+		<div class="layui-collapse">
+			<div class="layui-colla-item">
+				<h2 class="layui-colla-title">系统环境</h2>
+				<div class="layui-colla-content layui-show">
+				<p>
+					PHP版本：{:PHP_VERSION}<br>
+					MYSQL版本：{:get_mysql_server()}<br>
+					PHP运行方式：{:php_sapi_name()}<br>
+					服务器IP：{:$_SERVER['SERVER_NAME']}<br>
+					ThinkPHP版本：V5.0.11<br>
+					Layui版本：V1.0.9<br>
+				</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="layui-collapse">
+			<div class="layui-colla-item">
+				<h2 class="layui-colla-title">官方信息</h2>
+				<div class="layui-colla-content layui-show">
+				<p>
+					JunThink版本：V1.0.0.1<br/>
+					官方QQ交流群：368405253<br/>
+					作者：小黄牛<br/>
+					官网地址：<a href="http://www.junphp.com/think/">www.junphp.com/think/</a><br/>
+					<br/>
+					<br/>
+				</p>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	
+	
+
+</div>
+
+<script>
+layui.use('element', function(){
+  var element = layui.element();
+});
+</script>
+
+</body>
+</html>

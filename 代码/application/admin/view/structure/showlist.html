@@ -1,0 +1,98 @@
+{include file="index/head" /}
+
+		<!-- 添加需要的参数 -->
+		<input type="hidden" id="str_name" value="">
+		<input type="hidden" id="str_id" value="">
+		<input type="hidden" id="role_name" value="">
+		<input type="hidden" id="role_id" value="">
+	
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">组织管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li class="layui-this">组织列表</li>
+						{if condition="$adminController->vif('structure','add')"}<li><a href="{:url('structure/add')}" role="button" data-toggle="modal" class="model">新增组织</a></li>{/if}
+					</ul>
+				</div> 
+
+				<div class="layui-field-box layui-form" style="width: 370px;float: left;height: 553px;overflow-y: auto; border: 1px solid #ccc;">
+					<ul id="demo"></ul>
+				</div>
+
+				<div class="layui-field-box layui-form" style="width: 59%;float: right;height: 553px;overflow-y: auto; padding: 0">
+					<table class="layui-table admin-table" style="margin: 0">
+						<thead>
+							<tr>
+								<th>组织名称</th>
+								<th>添加时间</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+							{volist name="list" id="v"}
+							<tr>
+								<td>{$v.s_name}</td>
+								<td>{$v.add_time|date="Y-m-d H:i:s",###}</td>
+								<td>
+									{if condition="$adminController->vif('structure','upd')"}<a class='layui-btn layui-btn-mini' href="upd/id/{$v.s_id}">编辑</a>{/if}
+									{if condition="$adminController->vif('structure','del')"}<a class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirm('真的要删除吗?')" href="del/id/{$v.s_id}">删除</a>{/if}
+								</td>
+							</tr>
+							{/volist}
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+			<div class="admin-table-page">
+				<div id="paged" class="page">
+				</div>
+			</div>
+		</div>
+
+<script type="text/javascript">
+layui.use(['tree', 'layer'], function(){
+	var layer = layui.layer,$ = layui.jquery; 
+	// 地区节点树
+	layui.tree({
+		elem: '#demo' //指定元素
+		,target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
+		,click: function(item){ //点击节点回调
+		var id   = item.id;
+		var name = item.name;
+
+		$.ajax({
+			type: 'post',
+			data:{'id':id},
+			url: "{:url('structure/showlist')}",
+			success: function(data) {
+				var array = eval(data);
+				var html = '';
+				for(var i=0; i<array.length; i++){
+					html += "<tr>";
+					html += "<td>"+array[i]['s_name']+"</td>";
+					html += "<td>"+getLocalTime(array[i]['add_time'])+"</td>";
+					html += "<td>";
+					{if condition="$adminController->vif('structure','upd')"}html += "<a class='layui-btn layui-btn-mini' href='upd/id/"+array[i]['s_id']+"'>编辑</a>";{/if}
+					{if condition="$adminController->vif('structure','del')"}html += '<a class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirm('+"'真的要删除此信息吗?'"+')" href="del/id/'+array[i]['s_id']+'">删除</a>';{/if}
+					html += "</td>";
+					html += "</tr>";
+				}
+				$('#content').html(html);
+			}
+		});
+
+		console.log(item);
+		}
+		,nodes: {$json} //节点
+	});
+});
+function getLocalTime(nS) {
+  return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " "); 
+}
+</script>
+
+</body>
+</html>

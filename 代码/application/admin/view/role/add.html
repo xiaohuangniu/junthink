@@ -1,0 +1,108 @@
+{include file="index/head" /}
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">角色管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('role/showlist')}">角色列表</a></li>
+						<li class="layui-this"><a href="{:url('role/add')}">新增角色</a></li>
+					</ul>
+				</div> 
+
+				<div class="layui-field-box layui-form" style="width: 370px;float: left;height: 553px;overflow-y: auto; border: 1px solid #ccc;">
+					<ul id="demo"></ul>
+				</div>
+
+				<div class="layui-field-box layui-form" style="width: 600px;float: left;height: 553px;overflow-y: auto; padding: 30px 0 0 50px">
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px" style="line-height: 36px;">角色名称</label>
+						<div class="layui-input-block">
+							<input class="layui-input" lay-verify="controller" type="text" id="name" value="">
+						</div>
+					</div>
+
+					<div class="layui-form-item layui-form-text">
+						<label class="layui-form-label">备注</label>
+						<div class="layui-input-block">
+							<textarea class="layui-textarea" id="remark" rows="3" placeholder="输入备注，可为空"></textarea>
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">状态</label>
+						<div class="layui-input-block">
+							<input type="radio" name="status" title="开启" value="1" checked>
+							<input type="radio" name="status" title="关闭" value="2">
+						</div>
+					</div>
+					
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button type="button" class="layui-btn model" id="upd_btn">新增</button>
+						</div>
+					</div>
+
+				</div>
+			</fieldset>
+		</div>
+<script type="text/javascript">
+layui.use(['form', 'layedit', 'laydate'], function() {
+	var form = layui.form(),layer = layui.layer;
+});
+</script>
+
+<link rel="stylesheet" href="{:__PUBLIC__}/libs/layui/layui_1/css/layui.css" type="text/css" media="all" />
+<style>#demo input[type=checkbox], #demo  input[type=radio], #demo select {display: initial;}.layui-tree-branch,.layui-tree-leaf{display: none}</style>
+<script src="{:__PUBLIC__}/libs/layui/layui_1/layui.js"></script>
+
+<script type="text/javascript">
+layui.use(['tree', 'layer'], function(){
+	var layer = layui.layer,$ = layui.jquery; 
+	// 地区节点树
+	var tree = layui.tree({
+            elem: '#demo',
+            check: 'checkbox',
+            skin: 'as',
+            drag: true,
+            checkboxName: 'id',
+            checkboxStyle: "",
+            nodes: {$json}
+		});
+	});
+
+	$("#upd_btn").click(function(){ 
+		var id =[]; 
+		$('input[name="id"]:checked').each(function(){ 
+			id.push($(this).val()); 
+		}); 
+		var name   = $('#name').val();
+		var status = $('input[name="status"]:checked').val();
+		var remark = $('#remark').val();
+		var data   = {'id':JSON.stringify(id), 'name':name, 'remark':remark, 'status':status};
+		if (name == '' || status == '') { return false;}
+
+		$.ajax({
+			type: 'post',
+			data:data,
+			url: "{:url('role/add')}",
+			success: function(data) {
+				var array = $.parseJSON(data);
+				if(array.code == '01'){
+					layer.tips(array.msg, '#upd_btn', {tips: [4, 'red']});
+				}else{
+					layer.tips(array.msg, '#upd_btn', {tips: [2, '#78BA32']});
+					setTimeout(function(){window.location.reload();},1000); 
+				}
+			}
+		});
+	}); 
+
+
+	
+
+</script>
+
+</body>
+</html>

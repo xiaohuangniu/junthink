@@ -1,0 +1,113 @@
+{include file="index/head" /}
+
+		<!-- 添加需要的参数 -->
+		<input type="hidden" id="str_name" value="">
+		<input type="hidden" id="str_id" value="">
+		<input type="hidden" id="role_name" value="">
+		<input type="hidden" id="role_id" value="">
+	
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">组织管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('structure/showlist')}">组织列表</a></li>
+						{if condition="$adminController->vif('structure','add')"}<li><a href="{:url('structure/add')}">新增组织</a></li>{/if}
+						<li class="layui-this">修改组织</li>
+					</ul>
+				</div> 
+
+				<div class="layui-field-box layui-form" style="width: 370px;float: left;height: 553px;overflow-y: auto; border: 1px solid #ccc;">
+					<ul id="demo"></ul>
+				</div>
+
+				<div class="layui-field-box layui-form" style="width: 49%;float: left;height: 553px;overflow-y: auto; padding: 0 0 0 30px;">
+					
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px">选择上级</label>
+						<div class="layui-input-block" id="upd_title" style="line-height: 36px;">{$region_name}</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px" style="line-height: 36px;">组织名称</label>
+						<div class="layui-input-block">
+							<input class="layui-input" lay-verify="controller" type="text" id="upd_name" value="{$info.s_name}">
+						</div>
+					</div>
+
+					<input type="hidden" id="upd_pid" value="{$info.s_pid}">
+					<input type="hidden" id="s_id" value="{$info.s_id}">
+					
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button type="button" class="layui-btn model" id="upd_btn">修改</button>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<div class="admin-table-page">
+				<div id="paged" class="page">
+				</div>
+			</div>
+		</div>
+
+<script type="text/javascript">
+layui.use(['tree', 'layer'], function(){
+	var layer = layui.layer,$ = layui.jquery; 
+	// 地区节点树
+	layui.tree({
+		elem: '#demo' //指定元素
+		,target: '_blank' //是否新选项卡打开（比如节点返回href才有效）
+		,click: function(item){ //点击节点回调
+			var id   = item.id;
+			var name = item.name;
+			$('#upd_title').html(name);
+			$('#upd_pid').val(id);
+			console.log(item);
+		}
+		,nodes: {$json} //节点
+	});
+});
+
+// 修改地区
+$("#upd_btn").click(function(){
+	// 加载层
+	var index = layer.load(1, {shade: [0.4,'#000']});
+	var s_id = $('#s_id').val();
+	var pid  = $('#upd_pid').val();
+	var name = $('#upd_name').val();
+
+	if(pid == ''){
+		layer.tips('请选择对应的上级地区', '#demo', {tips: [4, 'red']});
+		layer.close(index);
+		return true;
+	}else if(name == ''){
+		layer.tips('请输入地区名称', '#add_name', {tips: [4, 'red']});
+		layer.close(index);
+		return false;
+	}
+	
+	// Ajax
+	$.ajax({
+		type: 'post',
+		data:{'s_id':s_id, 'pid':pid, 'name':name},
+		url: "{:url('structure/upd')}",
+		success: function(data) {
+			var array = $.parseJSON(data);
+			if(array.code == '01'){
+				layer.tips(array.msg, '.model', {tips: [4, 'red']});
+			}else{
+				layer.tips(array.msg, '.model', {tips: [2, '#78BA32']});
+				setTimeout(function(){window.location.reload();},1000); 
+			}
+			layer.close(index);
+		}
+	});
+});
+
+</script>
+
+</body>
+</html>

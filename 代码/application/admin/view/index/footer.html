@@ -1,0 +1,119 @@
+﻿
+<!-- 页脚版权  -->
+<footer id="footer" class="app-footer">
+<div class="wrapper b-t bg-light">
+    <span class="pull-right">
+        JunThink v1.0
+    <a href="" ui-scroll="app" class="m-l-sm text-muted"><i class="fa fa-long-arrow-up"></i></a>
+    </span>
+    极资源 - 小黄牛&copy; 2017 Copyright.
+</div>
+</footer>
+<!-- /页脚版权 -->     
+</div>
+<!-- js引用 -->
+<script src="{:__PUBLIC__}/libs/jquery/bootstrap/dist/js/bootstrap.js"></script>
+<script src="{:__PUBLIC__}/js/ui-load.js"></script>
+<script src="{:__PUBLIC__}/js/ui-jp.config.js"></script>
+<script src="{:__PUBLIC__}/js/ui-jp.js"></script>
+<script src="{:__PUBLIC__}/js/ui-nav.js"></script>
+<script src="{:__PUBLIC__}/js/ui-toggle.js"></script>
+<script src="{:__PUBLIC__}/js/ui-client.js"></script>
+<script>
+    layui.use(['element', 'layer'], function() {
+        var element = layui.element(),
+            $ = layui.jquery,
+            layer = layui.layer;
+
+        //iframe自适应
+        $(window).on('resize', function() {
+            var $content = $('.admin-nav-card .layui-tab-content');
+            $content.height($(this).height() - 177);
+            $content.find('iframe').each(function() {
+                $(this).height($content.height());
+                $('#aside').height($content.height());
+                $('#content').height($content.height());
+                $('#jun_nav').height($content.height()+123);
+                $(this).css({border:'none',width:'100%'});
+            });
+        }).resize();
+
+        //添加tab
+        var $tabs = $('#admin-tab');
+        var Num = 0;
+        var $container = $('#admin-tab-container');
+        //绑定 nav 点击事件
+        $('ul.nav').find('li > a').each(function () {
+            var $this = $(this);
+            //获取设定的url
+            var url = $this.data('url');
+            if(url !== undefined) {
+                $this.on('click', function() {
+                    var iframe = '<iframe src="' + url + '"></iframe>';
+                    var count = 0;
+                    var tabIndex;
+                    $tabs.find('li').each(function(i, e) {
+                        var $cite = $(this).children('key');
+                        if ($cite.text() === $this.find('key').text()) {			
+                            count++;
+                            tabIndex = i;
+                        };
+                    });		
+
+                    //tab不存在
+                    if (count === 0) {
+                        if (Num >= 10) {
+                            layer.msg('选项打开的有点多了哦！<br />请关闭一个后再打开...', {
+                                time: 10000, //20s后自动关闭
+                                btn: ['明白了', '不理会']
+                            });
+                            return;
+                        }
+                        //添加删除样式					    
+                        var keyvalue = $this.find('key').text();
+                        aHtml = '<key>' + keyvalue + '</key>';
+                        aHtml += '<i class="layui-icon layui-unselect layui-tab-close">&#x1006;</i>';
+                        Num++;
+                        //添加tab
+                        element.tabAdd('admin-tab', {
+                            'title': aHtml,
+                            'content': iframe,
+                            'id':Num
+                        });
+                        
+                        //iframe 自适应
+                        var $content = $('.admin-nav-card .layui-tab-content');
+                        $content.find('iframe').each(function() {
+                            $(this).height($content.height());
+                            $(this).css({ border: 'none', width: '100%' });
+                        });
+                        //绑定关闭事件
+                        $tabs = $('#admin-tab');
+                        var $li = $tabs.find('li');
+
+                        $li.eq($li.length - 1).children('i.layui-tab-close').on('click', function() {
+                            element.tabDelete('admin-tab', $(this).parent('li').index()).init();
+                            Num--;
+                        });
+                        //获取焦点
+                        element.tabChange('admin-tab', $li.length - 1);
+                    } else {
+                        //切换tab
+                        element.tabChange('admin-tab', tabIndex);
+                    }
+                });
+            }
+        });
+        //手机设备的简单适配
+        var treeMobile = $('.site-tree-mobile'),
+            shadeMobile = $('.site-mobile-shade');
+        treeMobile.on('click', function() {
+            $('body').addClass('site-mobile');
+        });
+        shadeMobile.on('click', function() {
+            $('body').removeClass('site-mobile');
+        });
+    });
+</script>
+</body>
+</html>

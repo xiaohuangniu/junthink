@@ -1,0 +1,107 @@
+{include file="index/head" /}
+
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">岗位管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('job/showlist')}">岗位列表</a></li>
+						{if condition="$adminController->vif('job','add')"}<li><a href="{:url('job/add')}">新增岗位</a></li>{/if}
+						<li class="layui-this">修改岗位</li>
+					</ul>
+				</div> 
+
+				<div class="layui-field-box layui-form" style="width: 300px;float: left;height: 553px;overflow-y: auto; border: 1px solid #ccc;">
+					<ul id="demo"></ul>
+				</div>
+
+				<div class="layui-field-box layui-form" style="width: 700px;float: left;height: 553px;padding: 0 0 0 30px;">
+					
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px">对应组织</label>
+						<div class="layui-input-block" id="title" style="line-height: 36px;">{$info.s_name}</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">岗位名称</label>
+						<div class="layui-input-block">
+							<input class="layui-input" lay-verify="controller" type="text" id="name" value="{$info.j_name}">
+						</div>
+					</div>
+
+					<div class="layui-form-item">
+						<label class="layui-form-label" style="width:100px;">对应角色</label>
+						<div class="layui-input-block">
+							{volist name="role" id="v"}
+								<input type="checkbox" name="id" title="{$v.r_name}" value="{$v.r_id}" {if condition="in_array($v['r_id'], $array)"}checked{/if}>
+							{/volist}
+						</div>
+					</div>
+
+					<input type="hidden" id="pid" value="{$info.s_id}">
+					
+					<div class="layui-form-item">
+						<div class="layui-input-block">
+							<button type="button" class="layui-btn model" id="upd_btn">修改</button>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<div class="admin-table-page">
+				<div id="paged" class="page">
+				</div>
+			</div>
+		</div>
+
+<script type="text/javascript">
+layui.use(['form','tree', 'layer'], function(){
+	var layer = layui.layer,$ = layui.jquery, form = layui.form; 
+	// 节点树
+	layui.tree({
+		elem: '#demo' //指定元素
+		,target: '_blank' 
+		,click: function(item){ //点击节点回调
+			var id   = item.id;
+			var name = item.name;
+			$('#title').html(name);
+			$('#pid').val(id);
+			console.log(item);
+		}
+		,nodes: {$json} //节点
+	});
+});
+
+// 新增
+$("#upd_btn").click(function(){
+	var id =[]; 
+	$('input[name="id"]:checked').each(function(){ 
+		id.push($(this).val()); 
+	}); 
+	var name = $('#name').val();
+	var pid  = $('#pid').val();
+	
+	var data   = {'upd_id':'{$info.j_id}','id':JSON.stringify(id), 'name':name, 'pid':pid};
+	if (name == '' || pid == '') { return false;}
+
+	$.ajax({
+		type: 'post',
+		data:data,
+		url: "{:url('job/upd')}",
+		success: function(data) {
+			var array = $.parseJSON(data);
+			if(array.code == '01'){
+				layer.tips(array.msg, '#upd_btn', {tips: [4, 'red']});
+			}else{
+				layer.tips(array.msg, '#upd_btn', {tips: [2, '#78BA32']});
+				setTimeout(function(){window.location.reload();},1000); 
+			}
+		}
+	});
+});
+
+</script>
+
+</body>
+</html>

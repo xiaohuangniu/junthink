@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+<!-- meta -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="renderer" content="webkit">
+<meta charset="UTF-8">
+<title>JunThink</title>
+<link rel="stylesheet" type="text/css" href="{:__PUBLIC__}/css/login.css" />
+<link rel="stylesheet" href="{:__PUBLIC__}/css/jun.it.alert.css" type="text/css" media="all" />
+<script src="{:__PUBLIC__}/libs/jquery/jquery/dist/jquery.js"></script>
+<script src="{:__PUBLIC__}/js/jun.it.alert.js"></script>
+
+</head>
+
+<body>
+    <!-- 页面主体START -->
+    <header class="sso_header"><span class="logo ">JunThink V1.0.0.1</span></header>
+    <section class="content_box cleafix">
+        <div class="left_area fl">
+            <div class="form_body" >
+                <form class="active" action="javascript:;">
+                    <div class="input_item clearfix" >
+                        <input type="text" class="input input_white" id="name" placeholder="请输入账号">
+                        <span id="vif-name"></span>
+                    </div>
+                    <div class="input_item clearfix" >
+                        <input type="password" class="input input_white" id="pwd" placeholder="请输入密码" >
+                        <span id="vif-pwd"></span>
+                    </div>
+
+                    <div class="input_item clearfix" >
+                        <div class="input_group clearfix">
+                            <input type="text" class="input input_white verify_code_input fl" id="vif" placeholder="请证明你不是机器人" >
+                            <img src="{:captcha_src()}" onClick="this.src='{:captcha_src()}?id='+Math.random()" class="yzm">
+                            <span id="vif-no"></span>
+                        </div>
+                    </div>
+
+                    <div class="input_item btn_group clearfix" >
+                        <input type="submit" class="btn btn_green btn_active btn_block btn_lg" value="登&nbsp;录" >
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+    <div class="bottom">
+        极资源 - 小黄牛© 2017 Copyright. 技术交流群：368405253
+    </div>
+<script>
+// 登录
+$(".btn_block").click(function(){
+	
+	var name = $('#name').val();
+	var pwd  = $('#pwd').val();
+	var vif  = $('#vif').val();
+    var data = {'name':name, 'pwd':pwd, 'vif':vif};
+	$.ajax({
+		type: 'post',
+		data:data,
+		url: "{:url('login/vif')}",
+		success: function(data) {
+			var array = $.parseJSON(data);
+			if(array.code == '01'){
+				$.prompt({
+                    Id          : array.data,
+                    Content     : array.msg, 
+                    Color       : 'red',                // 文字颜色，默认为:red
+                    OutState    : true,                 // 是否开启自动关闭，默认为:true
+                    OutTime     : 2000,                 // 自动关闭时间，默认为:1500(S)
+                });
+			}else if(array.code == '02'){
+				$.warning({
+                    Id          : 'App-no',
+                    Content     : array.msg, 
+                });
+			}else{
+                $.warning({
+                    Id          : 'App-yes',
+                    Content     : '登录成功，系统正在为您跳转...', 
+                });
+				setTimeout(function(){window.location.href="{:url('index/index')}";},1000); 
+			}
+		}
+	});
+});    
+</script>
+</html>
