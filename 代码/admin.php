@@ -13,7 +13,7 @@
 define('BIND_MODULE', 'admin');
 
 // ADMIN常量
-define('__PUBLIC__', '/tp5/public/admin');
+define('__PUBLIC__', str_replace('admin.php', '', $_SERVER['SCRIPT_NAME']) . 'public/admin');
 
 // 定义应用目录
 define('APP_PATH', __DIR__ . '/application/');
