@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 菜单管理
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.2
  + Initial-Time : 2017-09-25 09:06
- + Last-time    : 2017-09-25 09:06 + 小黄牛
- + Desc         : 
+ + Last-time    : 2017-09-28 13:45 + 小黄牛
+ + Desc         : 增加日志记录
  +----------------------------------------------------------------------
 */
 
@@ -52,17 +52,16 @@ class Menu extends Admin{
         $id   = Request::instance()->param('id');
         $info = $this->DB->where("m_id = '{$id}'")->find();
 
-        if (!$info) $this->error('需要删除的菜单不存在');
+        if (!$info) $this->addLog('删除权限菜单', '需要删除的菜单不存在', 3);
             
         $info = $this->DB->where("m_pid = '{$id}'")->find();
-        if ($info) $this->error('该菜单下还存在节点，请先删除所有子节点');
+        if ($info) $this->addLog('删除权限菜单', '该菜单下还存在节点，请先删除所有子节点', 3);
 
         $res = $this->DB->where("m_id = '{$id}'")->delete();
-        if ($res) $this->error('删除成功');
+        if ($res) $this->addLog('删除权限菜单', '删除成功', 1);
         
-        $this->error('删除失败');
+        $this->addLog('删除权限菜单', '删除失败', 2);
     }
-
     
     /**
      * 新增
@@ -100,7 +99,11 @@ class Menu extends Admin{
                 $upd_data = ['m_path' => $m_path.'/'.$id];
             }
             $res =  $this->DB->where('m_id', $id)->update($upd_data);
-            if ($res > 0) echoJson('00', '新增成功');
+            if ($res > 0) {
+                $this->addLog('新增权限菜单', '新增成功', 1, false);
+                echoJson('00', '新增成功');
+            }
+            $this->addLog('新增权限菜单', '新增失败', 2, false);
             echoJson('01', '新增失败');
         }else{
             $pid  = Request::instance()->param('pid');
@@ -142,7 +145,11 @@ class Menu extends Admin{
             ];
             
             $res =  $this->DB->where('m_id', $id)->update($upd_data);
-            if ($res > 0) echoJson('00', '修改成功');
+            if ($res > 0) {
+                $this->addLog('修改权限菜单', '修改成功', 1, false);
+                echoJson('00', '修改成功');
+            }
+            $this->addLog('修改权限菜单', '新增失败', 2, false);
             echoJson('01', '修改失败');
         }else{
             $id   = Request::instance()->param('id');

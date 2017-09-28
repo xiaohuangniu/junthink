@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 登录
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.2
  + Initial-Time : 2017-09-26 17:01
- + Last-time    : 2017-09-26 17:01 + 小黄牛
- + Desc         : 
+ + Last-time    : 2017-09-28 11:02 + 小黄牛
+ + Desc         : 新增登录日志记录
  +----------------------------------------------------------------------
 */
 
@@ -47,6 +47,8 @@ class Login extends Controller {
 			if (md5($pwd . $res['m_time']) != $res['m_pwd']) echoJson('01', '用户名或密码错误', 'vif-name');
 
 			Session::set('admin', $res);
+			# 写入日志
+			$this->add_login_log($res['m_id']);
 			echoJson('00', '登录成功');
         }
 
@@ -59,5 +61,19 @@ class Login extends Controller {
 	public function out(){
 		Session::delete('admin');
 		$this->redirect('login/index');
+	}
+
+	/**
+	 * 添加日志记录
+	 * @param int $id 管理员ID
+	 */
+	private function add_login_log($id){
+		$request = Request::instance();
+		$data    = [
+			'm_id'   => $id,
+			'l_ip'   => $request->ip(),
+			'l_time' => time(),
+		];
+		Db::name('manager_login_log')->insert($data);
 	}
 }

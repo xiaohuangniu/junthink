@@ -660,7 +660,11 @@ body {
 }
 
 body {
-  overflow: hidden;
+  overflow-y: hidden;
+}
+
+.body {
+  overflow-y: auto;
 }
 
 .app {

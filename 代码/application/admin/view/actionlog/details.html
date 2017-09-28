@@ -1,0 +1,124 @@
+{include file="index/head" /}
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">操作日志</legend>
+
+				<div class="layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('actionlog/showlist')}">操作日志列表</a></li>
+						{if condition="$adminController->vif('actionlog','emptyall')"}<li><a href="{:url('actionlog/emptyall')}">清空日志</a></li>{/if}
+						<li class="layui-this">查看详情</li>
+					</ul>
+				</div> 
+
+
+				<div class="layui-field-box layui-form">
+					
+
+					<div class="bs-example">
+						<table class="table table-bordered">
+							<tbody>
+							<tr>
+								<th>标题</th>
+								<th>
+									{$info.mal_type}								
+								</th>
+							</tr>
+							<tr>
+								<th>执行状态</th>
+								<th>
+									{switch $info.mal_status}
+										{case 1} <font style="color: #009688">成功</font> {/case}
+										{case 2} <font style="color: #01AAED">失败</font> {/case}
+										{case 3} <font style="color: #FF5722">异常</font> {/case}
+									{/switch}							
+								</th>
+							</tr>
+							<tr>
+								<th>操作详情</th>
+								<th>
+									{$info.mal_des}						
+								</th>
+							</tr>
+
+							<tr>
+								<th>执行地址</th>
+								<th>
+									{$info.mal_url}
+								</th>
+							</tr>
+							<tr>
+								<th width="150">执行者</th>
+								<td>
+									{$info.m_nice}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">执行者所属组织</th>
+								<td>
+									{$info.s_id}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">执行者所属岗位</th>
+								<td>
+									{$info.j_id}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">执行者所授权角色</th>
+								<td>
+									{$info.r_id}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">执行IP</th>
+								<td>
+									{$info.mal_ip}
+								</td>
+							</tr>
+
+							<tr>
+								<th width="150">IP所属地区</th>
+								<td>
+									{$region}
+								</td>
+							</tr>
+
+							<tr>
+								<th width="150">带宽类型</th>
+								<td>
+									{$isp}
+								</td>
+							</tr>
+
+							<tr>
+								<th>执行时间</th>
+								<td>
+									{$info.mal_time|date="Y-m-d H:i:s",###}
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					</div>
+
+					
+				</div>
+			</fieldset>
+		</div>
+
+</body>
+<script>
+//Demo
+layui.use('form', function(){
+  var form = layui.form();
+  
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    layer.msg(JSON.stringify(data.field));
+    return false;
+  });
+});
+</script>
+</html>

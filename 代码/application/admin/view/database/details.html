@@ -1,0 +1,86 @@
+{include file="index/head" /}
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 120px">数据库列表</legend>
+
+				<div class="layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('database/showlist')}">数据库列表</a></li>
+						{if condition="$adminController->vif('database','download')"}<li><a href="download/type/2/">下载备份</a></li>{/if}
+						{if condition="$adminController->vif('database','backup')"}<li><a onclick="return confirm('真的要备份吗?')" href="backup/type/2/">全部备份</a></li>{/if}
+						<li class="layui-this">查看详情</li>
+					</ul>
+				</div> 
+
+
+				<div class="layui-field-box layui-form">
+					
+
+					<div class="bs-example">
+						<table class="table table-bordered">
+							<tbody>
+							<tr>
+								<th>表名</th>
+								<th colspan="6">{$data.table}</th>
+							</tr>
+							<tr>
+								<th>别名</th>
+								<th colspan="6">{$data.remark}</th>
+							</tr>
+							<tr>
+								<th>表编码</th>
+								<th colspan="6">{$data.code}</th>
+							</tr>
+
+							<tr>
+								<th>总数据量</th>
+								<th colspan="6">{$data.count}</th>
+							</tr>
+
+							<tr><th colspan="7" style="text-align: center">字段信息</th></tr>
+							
+							<tr>
+								<th>字段名</th>
+								<th>别名</th>
+								<th>类型</th>
+								<th>索引</th>
+								<th width="150">默认值</th>
+								<th width="50">自增</th>
+								<th width="50">为空</th>
+							</tr>
+
+							{volist name="list" id="v"}
+
+							<tr>
+								<th>{$v.Field}</th>
+								<th>{$v.Comment}</th>
+								<th>{$v.Type}</th>
+								<th>
+									{switch name="$v.Key"}
+										{case value="PRI"}主键索引{/case}
+										{case value="MUL"}普通索引{/case}
+										{case value="UNI"}唯一索引{/case}
+										{default /}{$v.Key}
+									{/switch}
+								</th>
+								<th>{$v.Default}</th>
+								<th>
+									{if condition="!empty($v['Extra'])"}YES{else /}NO{/if}
+								</th>
+								<th>{$v.Null}</th>
+							</tr>
+
+							{/volist}	
+							</tbody>
+						</table>
+					</div>
+
+					
+				</div>
+			</fieldset>
+		</div>
+
+</body>
+
+</html>

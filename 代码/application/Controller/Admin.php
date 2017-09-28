@@ -5,8 +5,8 @@
  + Author       : 小黄牛
  + Version      : V1.0.0.1
  + Initial-Time : 2017-09-21 14:39
- + Last-time    : 2017-09-27 10:21 + 小黄牛
- + Desc         : 
+ + Last-time    : 2017-09-28 11:41 + 小黄牛
+ + Desc         : 新增操作日志记录方法
  +----------------------------------------------------------------------
 */
 
@@ -134,5 +134,30 @@ class Admin extends Controller {
 			}
 		}
 		return $status;
+	}
+
+	/**
+	 * 记录操作日志
+	 * @param string $type   操作类型
+	 * @param string $title  详细描述
+	 * @param int    $status 操作状态 1|2|3 成功|失败|异常
+	 * @param bool   $model  是否需要重定向回上一页
+	 * @return 无
+	 */
+	protected function addLog($type, $title, $status, $model=true){
+		$admin   = Session::get('admin');
+		$request = Request::instance();
+		$data    = [
+			'm_id'       => $admin['m_id'],
+			'mal_type'   => $type,
+			'mal_des'    => $title,
+			'mal_status' => $status,
+			'mal_time'   => time(),
+			'mal_ip'     => $request->ip(),
+			'mal_url'    => $request->url(),
+			'mal_mode'   => $request->method(),
+		];
+		Db::name('manager_action_log')->insert($data);
+		if ($model) $this->error($title);
 	}
 }

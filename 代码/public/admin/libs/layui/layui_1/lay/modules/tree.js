@@ -122,50 +122,6 @@ layui.define("jquery", function (e) {
                 });
             }
         },
-        i.prototype.cancelParentsCheckboxCheck = function (ele) {
-            //当当前的checkbox为未选中时，判断是否取消父级checkbox的选中
-            if (!ele) {
-                return;
-            }
-            var r = this,
-                siblingInputs = r.siblingInputs(ele),//获取当前checkbox的兄弟级checkbox
-                parentId = ele.getAttribute("data-parent-id"),
-                parentInput = null,
-                bool = true,
-                childrendInputs = null,
-                hasOneChildrenInputCheck = false;
-
-            if (parentId != 'undefined') {
-                //获取当前checkbox的父级checkbox
-                parentInput = document.getElementById(parentId);
-                childrendInputs = r.currentChildrenInputs(parentInput);
-            }
-
-            for (var i = 0, len = siblingInputs.length; i < len; i++) {
-                if (siblingInputs[i].checked) {
-                    bool = false;
-                    break;
-                }
-            }
-            if (!childrendInputs || childrendInputs.length == 0) {
-                hasOneChildrenInputCheck = false;
-            } else {
-                for (var j = 0, len2 = childrendInputs.length; j < len2; j++) {
-                    if (childrendInputs[j].getAttribute("data-parent-id") != "undefined") {
-
-                        if (childrendInputs[j].checked) {
-                            hasOneChildrenInputCheck = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (bool && !hasOneChildrenInputCheck) {
-                r.inputChecked(parentInput, false);
-            }
-
-            this.cancelParentsCheckboxCheck(parentInput);
-        },
         i.prototype.siblingInputs = function (ele) {
             //选择指定checkbox的同级兄弟checkbox
             var that = this;

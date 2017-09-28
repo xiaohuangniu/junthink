@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 岗位管理
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.2
  + Initial-Time : 2017-09-25 17:51
- + Last-time    : 2017-09-26 09:28 + 小黄牛
- + Desc         : 
+ + Last-time    : 2017-09-28 13:33 + 小黄牛
+ + Desc         : 增加日志记录
  +----------------------------------------------------------------------
 */
 
@@ -69,7 +69,10 @@ class Job extends Admin{
 			$name   = Request::instance()->post('name');                  // 岗位名称
             $r_id   = json_decode(Request::instance()->post('id'), true); // 角色ID
             $pid    = Request::instance()->post('pid');                   // 组织ID
-            if (!$r_id) echoJson('01', '请先选择所需关联的角色');
+            if (!$r_id) {
+                $this->addLog('新增岗位', '请先选择所需关联的角色', 3, false);
+                echoJson('01', '请先选择所需关联的角色');
+            }
             $menu   = implode(',', $r_id);
 
             $data = [
@@ -79,7 +82,11 @@ class Job extends Admin{
             ];
 
             $res  = Db::name('job')->insert($data);
-            if ($res > 0) echoJson('00', '新增成功');
+            if ($res > 0) {
+                $this->addLog('新增岗位', '新增成功', 1, false);
+                echoJson('00', '新增成功');
+            }
+            $this->addLog('新增岗位', '新增失败', 2, false);
             echoJson('01', '新增失败');
         }else{
 			# 获取所有组织节点
@@ -102,7 +109,10 @@ class Job extends Admin{
 			$name   = Request::instance()->post('name');                  // 岗位名称
             $r_id   = json_decode(Request::instance()->post('id'), true); // 角色ID
             $pid    = Request::instance()->post('pid');                   // 组织ID
-            if (!$r_id) echoJson('01', '请先选择所需关联的角色');
+            if (!$r_id) {
+                $this->addLog('修改岗位', '请先选择所需关联的角色', 3, false);
+                echoJson('01', '请先选择所需关联的角色');
+            }
             $menu   = implode(',', $r_id);
 
             $data = [
@@ -112,7 +122,11 @@ class Job extends Admin{
             ];
 
             $res  = Db::name('job')->where('j_id','=',$upd_id)->update($data);
-            if ($res > 0) echoJson('00', '修改成功');
+            if ($res > 0) {
+                $this->addLog('修改岗位', '修改成功', 1, false);
+                echoJson('00', '修改成功');
+            }
+            $this->addLog('修改岗位', '修改失败', 2, false);
             echoJson('01', '修改失败');
         }else{
 			# 获取所有组织节点
@@ -142,14 +156,14 @@ class Job extends Admin{
         $id   = Request::instance()->param('id');
         $s_id = Db::name('job')->where('j_id','=',$id)->find();
 
-        if (!$s_id) $this->error('该岗位不存在');
+        if (!$s_id) $this->addLog('删除岗位', '该岗位不存在', 3);
         $res  = Db::name('manager')->where('j_id','=',$id)->find();
-        if ($res)   $this->error('该岗位已被对应的管理员所关联，请先删除这些管理员账号');
+        if ($res)   $this->addLog('删除岗位', '该岗位已被对应的管理员所关联，请先删除这些管理员账号', 3);
 
         # 此处再判断一下是否有对应的组织
         $res = Db::name('job')->where('j_id','=',$id)->delete();
-        if ($res) $this->error('删除成功');
-        $this->error('删除失败');
+        if ($res) $this->addLog('删除岗位', '删除成功', 1);
+        $this->addLog('删除岗位', '删除失败', 2);
     }
 
 }

@@ -3,10 +3,11 @@
  +----------------------------------------------------------------------
  + Title        : 地区管理
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.2
  + Initial-Time : 2017-09-21 16:29
- + Last-time    : 2017-09-22 16:03 + 小黄牛
- + Desc         : 已完善，地区可自行做缓存处理
+ + Last-time    : 2017-09-28 14:03 + 小黄牛
+ + Desc         : 1、已完善，地区可自行做缓存处理
+                  2、增加日志记录
  +----------------------------------------------------------------------
 */
 
@@ -52,15 +53,15 @@ class Region extends Admin{
         $id   = Request::instance()->param('id');
         $info = $this->DB->where("r_id = '{$id}'")->find();
 
-        if (!$info) $this->error('需要删除的地区不存在');
+        if (!$info) $this->addLog('删除地区', '需要删除的地区不存在', 3);
             
         $info = $this->DB->where("r_pid = '{$id}'")->find();
-        if ($info) $this->error('该地区下还存在节点，请先删除所有子节点');
+        if ($info) $this->addLog('删除地区', '该地区下还存在节点，请先删除所有子节点', 3);
 
         $res = $this->DB->where("r_id = '{$id}'")->delete();
-        if ($res) $this->error('删除成功');
+        if ($res) $this->addLog('删除地区', '删除成功', 1);
         
-        $this->error('删除失败');
+        $this->addLog('删除地区', '删除失败', 2);
     }
 
     /**
@@ -77,13 +78,25 @@ class Region extends Admin{
 			$pinyin = Request::instance()->post('pinyin');
 
             # 简单过滤数据
-            if (empty($pid))  echoJson('01', '请选择对应的上级地区');
-            if (empty($name)) echoJson('01', '地区名称不能为空');
-            if (empty($code)) echoJson('01', '地区编码不能为空或0');
+            if (empty($pid))  {
+                $this->addLog('修改地区', '请选择对应的上级地区', 3, false);
+                echoJson('01', '请选择对应的上级地区');
+            }
+            if (empty($name)) {
+                $this->addLog('修改地区', '地区名称不能为空', 3, false);
+                echoJson('01', '地区名称不能为空');
+            }
+            if (empty($code)) {
+                $this->addLog('修改地区', '地区编码不能为空或0', 3, false);
+                echoJson('01', '地区编码不能为空或0');
+            }
            
             # 查询出原数据
 			$path  = $this->DB->where('r_id', $id)->value('r_id');
-			if ($path==false && $path != 0) echoJson('01', '原数据不存在');
+            if ($path==false && $path != 0) {
+                $this->addLog('修改地区', '原数据不存在', 3, false);
+                echoJson('01', '原数据不存在');
+            }
 			$data = [
                 'r_pid'    => $pid,
                 'r_name'   => $name,
@@ -92,7 +105,11 @@ class Region extends Admin{
                 'r_sort'   => $sort,		
             ];
             $res = $this->DB->where('r_id', $id)->update($data);	
-			if ($res > 0) echoJson('00', '修改成功');
+            if ($res > 0) {
+                $this->addLog('修改地区', '修改成功', 1, false);
+                echoJson('00', '修改成功');
+            }
+            $this->addLog('修改地区', '修改失败', 2, false);
             echoJson('01', '修改失败');
         }else{
 			# 获取所有地区节点
@@ -122,9 +139,18 @@ class Region extends Admin{
 			$pinyin = Request::instance()->post('pinyin');
 
             # 简单过滤数据
-            if (empty($pid))  echoJson('01', '请选择对应的上级地区');
-            if (empty($name)) echoJson('01', '地区名称不能为空');
-            if (empty($code)) echoJson('01', '地区编码不能为空或0');
+            if (empty($pid))  {
+                $this->addLog('新增地区', '请选择对应的上级地区', 3, false);
+                echoJson('01', '请选择对应的上级地区');
+            }
+            if (empty($name)) {
+                $this->addLog('新增地区', '地区名称不能为空', 3, false);
+                echoJson('01', '地区名称不能为空');
+            }
+            if (empty($code)) {
+                $this->addLog('新增地区', '地区编码不能为空或0', 3, false);
+                echoJson('01', '地区编码不能为空或0');
+            }
            
 			$data = [
                 'r_pid'    => $pid,
@@ -134,7 +160,11 @@ class Region extends Admin{
                 'r_sort'   => $sort,		
             ];
             $res = $this->DB->insert($data);	
-			if ($res > 0) echoJson('00', '新增成功');
+            if ($res > 0) {
+                $this->addLog('新增地区', '新增成功', 1, false);
+                echoJson('00', '新增成功');
+            }
+            $this->addLog('新增地区', '新增失败', 2, false);
             echoJson('01', '新增失败');
         }else{
 			# 获取所有地区节点

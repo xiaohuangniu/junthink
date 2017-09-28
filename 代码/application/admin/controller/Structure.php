@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 组织管理
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.2
  + Initial-Time : 2017-09-22 16:03
- + Last-time    : 2017-09-22 16:03 + 小黄牛
- + Desc         : 
+ + Last-time    : 2017-09-28 13:29 + 小黄牛
+ + Desc         : 增加日志记录
  +----------------------------------------------------------------------
 */
 
@@ -52,14 +52,14 @@ class Structure extends Admin{
         $id   = Request::instance()->param('id');
         $info = $this->DB->where("s_pid = '{$id}'")->find();
 
-        if ($info) $this->error('请先删除其下面的子类架构');
+        if ($info) $this->addLog('删除组织架构', '请先删除其下面的子类架构', 3);
 
-        if (Db::name('job')->where('s_id','=',$id)->find()) $this->error('该组织已被对应的岗位所关联，请先删除这些岗位');
+        if (Db::name('job')->where('s_id','=',$id)->find()) $this->addLog('删除组织架构', '该组织已被对应的岗位所关联，请先删除这些岗位', 3);
 
         # 此处再判断一下是否有对应的组织
         $res = $this->DB->where("s_id = '{$id}'")->delete();
-        if ($res) $this->error('删除成功');
-        $this->error('删除失败');
+        if ($res) $this->addLog('删除组织架构', '删除成功', 1);
+        $this->addLog('删除组织架构', '删除失败', 2);
     }
 
     /**
@@ -73,18 +73,32 @@ class Structure extends Admin{
 			$name   = Request::instance()->post('name');
 
             # 简单过滤数据
-            if (empty($pid))  echoJson('01', '请选择对应的上级组织');
-            if (empty($name)) echoJson('01', '组织名称不能为空');
+            if (empty($pid))  {
+                $this->addLog('修改组织架构', '请选择对应的上级组织', 3, false);
+                echoJson('01', '请选择对应的上级组织');
+            }
+            if (empty($name)) {
+                $this->addLog('修改组织架构', '组织名称不能为空', 3, false);
+                echoJson('01', '组织名称不能为空');
+            }
            
             # 查询出原数据
 			$path  = $this->DB->where('s_id', $id)->value('s_id');
-			if ($path==false && $path != 0) echoJson('01', '原数据不存在');
+            if ($path==false && $path != 0) {
+                $this->addLog('修改组织架构', '原数据不存在', 3, false);
+                echoJson('01', '原数据不存在');
+            }
+
 			$data = [
                 's_pid'    => $pid,
                 's_name'   => $name,		
             ];
             $res = $this->DB->where('s_id', $id)->update($data);	
-			if ($res > 0) echoJson('00', '修改成功');
+            if ($res > 0) {
+                $this->addLog('修改组织架构', '修改成功', 1, false);
+                echoJson('00', '修改成功');
+            }
+            $this->addLog('修改组织架构', '修改失败', 2, false);
             echoJson('01', '修改失败');
         }else{
 			# 获取所有节点
@@ -111,8 +125,14 @@ class Structure extends Admin{
 			$name   = Request::instance()->post('name');
 
             # 简单过滤数据
-            if (empty($pid))  echoJson('01', '请选择对应的上级组织');
-            if (empty($name)) echoJson('01', '组织名称不能为空');
+            if (empty($pid))  {
+                $this->addLog('新增组织架构', '请选择对应的上级组织', 3, false);
+                echoJson('01', '请选择对应的上级组织');
+            }
+            if (empty($name)) {
+                $this->addLog('新增组织架构', '组织名称不能为空', 3, false);
+                echoJson('01', '组织名称不能为空');
+            }
            
 			$data = [
                 's_pid'    => $pid,
@@ -120,7 +140,11 @@ class Structure extends Admin{
                 'add_time' => time(),	
             ];
             $res = $this->DB->insert($data);	
-			if ($res > 0) echoJson('00', '新增成功');
+            if ($res > 0) {
+                $this->addLog('新增组织架构', '新增成功', 1, false);
+                echoJson('00', '新增成功');
+            }
+            $this->addLog('新增组织架构', '新增失败', 2, false);
             echoJson('01', '新增失败');
         }else{
 			# 获取所有节点

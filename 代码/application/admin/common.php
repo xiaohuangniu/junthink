@@ -119,3 +119,22 @@ function get_mysql_server(){
     $version = db()->query("select version() as ver");
     return $version[0]['ver'];
 }
+
+/*
+ * 获得IP的真实地理信息 - TaoBao
+ * @param string $ip  IP地址
+ * @return array      返回成功查询后的数组
+*/
+function isTaobao($ip=''){
+	if(empty($ip)){    
+       return '请输入IP地址';  
+    }   
+	$url="http://ip.taobao.com/service/getIpInfo.php?ip=".$ip;
+	$ip=json_decode(file_get_contents($url));
+	if((string)$ip->code=='1'){
+  		return false;
+  	}
+	$data = (array)$ip->data;
+	return $data; 
+}
+

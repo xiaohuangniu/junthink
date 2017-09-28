@@ -1,0 +1,50 @@
+{include file="index/head" /}
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 120px">数据库列表</legend>
+
+				<div class="layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li class="layui-this"><a href="{:url('database/showlist')}">数据库列表</a></li>
+						{if condition="$adminController->vif('database','download')"}<li><a href="download/type/2/">下载备份</a></li>{/if}
+						{if condition="$adminController->vif('database','backup')"}<li><a onclick="return confirm('真的要备份吗?')" href="backup/type/2/">全部备份</a></li>{/if}
+					</ul>
+				</div> 
+
+
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table" style="margin: 0">
+						<thead>
+							<tr>
+								<th>数据库名称</th>	
+								<th width="300">别名</th>	
+								<th width="150">编码</th>	
+								<th width="150">数据量</th>	
+								<th width="210">操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+								{volist name="tables" id="v"}
+								<tr>
+									<td>{$v.table}</td>
+									<td>{$v.remark}</td>
+									<td>{$v.code}</td>
+									<td>{$v.count}</td>
+									<td>
+										{if condition="$adminController->vif('database','details')"}<a class="layui-btn layui-btn-normal layui-btn-mini" href="details/id/{$v.table}">详情</a>{/if}
+										{if condition="$adminController->vif('database','backup')"}<a class="layui-btn layui-btn-mini" onclick="return confirm('真的要备份吗?')" href="backup/type/1/id/{$v.table}">备份</a>{/if}
+										{if condition="$adminController->vif('database','download')"}<a class="layui-btn layui-btn-danger layui-btn-mini" href="download/type/1/id/{$v.table}">下载</a>{/if}
+										{if condition="$adminController->vif('database','restore')"}<a class="layui-btn layui-btn-mini" style="background-color: #2F4056;"  onclick="return confirm('真的要还原吗?')" href="restore/type/1/id/{$v.table}">还原</a>{/if}
+									</td>
+								</tr>
+								{/volist}
+						</tbody>
+					</table>
+				</div>
+			</fieldset>
+		</div>
+
+</body>
+
+</html>

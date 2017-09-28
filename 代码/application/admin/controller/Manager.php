@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 管理员
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.2
  + Initial-Time : 2017-09-26 10:17
- + Last-time    : 2017-09-26 10:17 + 小黄牛
- + Desc         : 
+ + Last-time    : 2017-09-28 13:56 + 小黄牛
+ + Desc         : 增加日志记录
  +----------------------------------------------------------------------
 */
 
@@ -94,11 +94,17 @@ class Manager extends Admin{
                 $j_id   = Request::instance()->post('pid');
                 
                 $DB     = Db::name('manager');
-                if ($DB->where('m_name','=',$name)->value('m_id')) echoJson('01', '用户已存在');
+                if ($DB->where('m_name','=',$name)->value('m_id')) {
+                    $this->addLog('新增管理员', '用户已存在', 3, false);
+                    echoJson('01', '用户已存在');
+                }
 
                 if ($j_id == 0) {
                     $count  = $DB->where('j_id = 0')->count();
-                    if ($count >= 3)  echoJson('01', '最多只能同时存在 3 个超级管理员');
+                    if ($count >= 3) {
+                        $this->addLog('新增管理员', '最多只能同时存在 3 个超级管理员', 3, false);
+                        echoJson('01', '最多只能同时存在 3 个超级管理员');
+                    }
                 } 
 
                 $data   = [
@@ -111,7 +117,11 @@ class Manager extends Admin{
                     'j_id'   => $j_id,
                 ];
                 $res    = $DB->insert($data);
-                if ($res) echoJson('00', '新增成功');
+                if ($res) {
+                    $this->addLog('新增管理员', '新增成功', 1, false);
+                    echoJson('00', '新增成功');
+                }
+                $this->addLog('新增管理员', '新增失败', 2, false);
                 echoJson('01', '新增失败');
             }
         }else{
@@ -149,12 +159,18 @@ class Manager extends Admin{
                 
                 $DB     = Db::name('manager');
                 if ($name != $upd_name) {
-                    if ($DB->where('m_name','=',$name)->value('m_id')) echoJson('01', '用户已存在');
+                    if ($DB->where('m_name','=',$name)->value('m_id')) {
+                        $this->addLog('修改管理员', '用户已存在', 3, false);
+                        echoJson('01', '用户已存在');
+                    }
                 }
 
                 if ($upd_jid != 0 && $j_id == 0) {
                     $count  = $DB->where('j_id = 0')->count();
-                    if ($count >= 3)  echoJson('01', '最多只能同时存在 3 个超级管理员');
+                    if ($count >= 3) {
+                        $this->addLog('修改管理员', '最多只能同时存在 3 个超级管理员', 3, false);
+                        echoJson('01', '最多只能同时存在 3 个超级管理员');
+                    }
                 }
 
                 $time   = $DB->where('m_id','=',$id)->value('m_time');
@@ -170,7 +186,11 @@ class Manager extends Admin{
                     'j_id'   => $j_id,
                 ];
                 $res    = $DB->where('m_id','=',$id)->update($data);
-                if ($res) echoJson('00', '修改成功');
+                if ($res) {
+                    $this->addLog('修改管理员', '修改成功', 1, false);
+                    echoJson('00', '修改成功');
+                }
+                $this->addLog('修改管理员', '修改失败', 2, false);
                 echoJson('01', '修改失败');
             }
         }else{
@@ -198,8 +218,8 @@ class Manager extends Admin{
     public function del(){
         $id  = Request::instance()->param('id');
         $res = Db::name('manager')->where("m_id = '{$id}'")->delete();
-        if ($res) $this->error('删除成功');
-         $this->error('删除失败');
+        if ($res) $this->addLog('删除管理员', '删除成功', 1);
+         $this->addLog('删除管理员', '删除失败', 2);
     }
 
 }

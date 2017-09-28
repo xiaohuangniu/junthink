@@ -1,0 +1,82 @@
+{include file="index/head" /}
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">操作日志</legend>
+
+				<div class="layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li class="layui-this"><a href="{:url('actionlog/showlist')}">操作日志列表</a></li>
+						{if condition="$adminController->vif('actionlog','emptyall')"}<li><a href="{:url('actionlog/emptyall')}">清空日志</a></li>{/if}
+					</ul>
+				</div> 
+
+
+				<div class="layui-field-box layui-form">
+					<table class="layui-table admin-table" style="margin: 0">
+						<thead>
+							<tr>
+								<th width="40"></th>
+								<th>ID</th>	
+								<th>管理员昵称</th>
+								<th>操作类型</th>
+								<th>操作状态</th>
+								<th>IP</th>
+								<th>操作时间</th>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tbody id="content">
+							<form method="POST" action="del/">
+								{volist name="list" id="v"}
+								<tr>
+									<td><input type="checkbox" name="id[]" lay-skin="primary" value="{$v.mal_id}"></td>
+									<td>{$v.mal_id}</td>
+									<td>{$v.m_nice}</td>
+									<td>{$v.mal_type}</td>
+									<td>
+										{switch $v.mal_status}
+											{case 1} <font style="color: #009688">成功</font> {/case}
+											{case 2} <font style="color: #01AAED">失败</font> {/case}
+											{case 3} <font style="color: #FF5722">异常</font> {/case}
+										{/switch}
+									</td>
+									<td>{$v.mal_ip}</td>
+									<td>{$v.mal_time|date="Y-m-d H:i:s",###}</td>
+									<td>
+										{if condition="$adminController->vif('actionlog','details')"}<a class="layui-btn layui-btn-mini" href="details/id/{$v.mal_id}">详情</a>{/if}
+										{if condition="$adminController->vif('actionlog','del')"}<a class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirm('真的要删除吗?')" href="del/id/{$v.mal_id}">删除</a>{/if}
+									</td>
+								</tr>
+								{/volist}
+							<tr>
+								<td></td>
+								<td colspan="7">
+									{if condition="$adminController->vif('actionlog','del')"}
+										<button	class="layui-btn layui-btn-small layui-btn-normal">删除</button>
+									{/if}
+								</td>
+							</tr>
+							</form>
+							
+						</tbody>
+					</table>
+					{$page}
+				</div>
+			</fieldset>
+		</div>
+
+</body>
+<script>
+//Demo
+layui.use('form', function(){
+  var form = layui.form();
+  
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    layer.msg(JSON.stringify(data.field));
+    return false;
+  });
+});
+</script>
+</html>

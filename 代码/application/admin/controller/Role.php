@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 角色管理
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.2
  + Initial-Time : 2017-09-25 11:12
- + Last-time    : 2017-09-25 11:12 + 小黄牛
- + Desc         : 
+ + Last-time    : 2017-09-28 13:40 + 小黄牛
+ + Desc         : 增加日志记录
  +----------------------------------------------------------------------
 */
 
@@ -46,7 +46,10 @@ class Role extends Admin{
             $pid    = json_decode(Request::instance()->post('id'), true);
             $status = Request::instance()->post('status');
             $remark = Request::instance()->post('remark');
-            if (!$pid) echoJson('01', '请先选择对应的权限');
+            if (!$pid) {
+                $this->addLog('新增角色', '请先选择对应的权限', 3, false);
+                echoJson('01', '请先选择对应的权限');
+            }
             $menu   = implode(',', $pid);
 
             $data = [
@@ -57,7 +60,11 @@ class Role extends Admin{
             ];
 
             $res  = $this->ROLE->insert($data);
-            if ($res > 0) echoJson('00', '新增成功');
+            if ($res > 0) {
+                $this->addLog('新增角色', '新增成功', 1, false);
+                echoJson('00', '新增成功');
+            }
+            $this->addLog('新增角色', '新增失败', 2, false);
             echoJson('01', '新增失败');
         }else{
             $list = $this->MENU->field('m_id as checkboxValue, m_name as name,  m_pid as pid')->where('m_type = 1 AND m_display = 1')->select();
@@ -76,7 +83,10 @@ class Role extends Admin{
             $pid    = json_decode(Request::instance()->post('id'), true);
             $status = Request::instance()->post('status');
             $remark = Request::instance()->post('remark');
-            if (!$pid) echoJson('01', '请先选择对应的权限');
+            if (!$pid) {
+                $this->addLog('修改角色', '请先选择对应的权限', 3, false);
+                echoJson('01', '请先选择对应的权限');
+            }
             $menu   = implode(',', $pid);
             $upd_id = Request::instance()->post('upd_id');
 
@@ -88,7 +98,11 @@ class Role extends Admin{
             ];
 
             $res  = $this->ROLE->where('r_id', $upd_id)->update($data);
-            if ($res > 0) echoJson('00', '修改成功');
+            if ($res > 0) {
+                $this->addLog('修改角色', '修改成功', 1, false);
+                echoJson('00', '修改成功');
+            }
+            $this->addLog('修改角色', '修改失败', 2, false);
             echoJson('01', '修改失败');
         }else{
             $list = $this->MENU->field('m_id as checkboxValue, m_name as name,  m_pid as pid')->where('m_type = 1 AND m_display = 1')->select();
@@ -107,8 +121,8 @@ class Role extends Admin{
         $id  = Request::instance()->param('id');
         # 先删除
         $res = Db::name('role')->where("r_id = '{$id}'")->delete();
-        if ($res) $this->error('删除成功');
-         $this->error('删除失败');
+        if ($res) $this->addLog('删除角色', '删除成功', 1);
+         $this->addLog('删除角色', '删除失败', 2);
     }
     
 }
