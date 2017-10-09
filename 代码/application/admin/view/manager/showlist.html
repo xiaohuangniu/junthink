@@ -15,7 +15,7 @@
 					<ul id="demo"></ul>
 				</div>
 
-				<div class="layui-field-box layui-form" style="width: 69%;float: right;height: 553px;overflow-y: auto; padding: 0">
+				<div class="layui-field-box layui-form" style="width: 59%;float: right;height: 553px;overflow-y: auto; padding: 0">
 					<table class="layui-table admin-table" style="margin: 0">
 						<thead>
 							<tr>
@@ -47,6 +47,7 @@
 								</td>
 								<td>{$v.m_time|date="Y-m-d H:i:s",###}</td>
 								<td>
+									{if condition="$adminController->vif('manager','details')"}<a class='layui-btn layui-btn-normal layui-btn-mini' href="details/id/{$v.m_id}">预览</a>{/if}
 									{if condition="$adminController->vif('manager','upd')"}<a class='layui-btn layui-btn-mini' href="upd/id/{$v.m_id}">编辑</a>{/if}
 									{if condition="$adminController->vif('manager','del')"}<a class="layui-btn layui-btn-danger layui-btn-mini" onclick="return confirm('真的要删除吗?')" href="del/id/{$v.m_id}">删除</a>{/if}
 								</td>

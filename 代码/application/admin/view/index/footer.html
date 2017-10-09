@@ -91,8 +91,8 @@
                         $tabs = $('#admin-tab');
                         var $li = $tabs.find('li');
 
-                        $li.eq($li.length - 1).children('i.layui-tab-close').on('click', function() {
-                            element.tabDelete('admin-tab', $(this).parent('li').index()).init();
+                        $li.eq($li.length - 1).children('i.layui-tab-close').on('click', function() {                            
+                            element.tabDelete('admin-tab', $(this).parent('li').attr('lay-id')).init();
                             Num--;
                         });
                         //获取焦点

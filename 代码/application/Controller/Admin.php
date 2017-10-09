@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 后台 - 中间件
  + Author       : 小黄牛
- + Version      : V1.0.0.1
+ + Version      : V1.0.0.3
  + Initial-Time : 2017-09-21 14:39
- + Last-time    : 2017-09-28 11:41 + 小黄牛
- + Desc         : 新增操作日志记录方法
+ + Last-time    : 2017-10-09 10:32 + 小黄牛
+ + Desc         : 新增地区权限验证方法、新增菜单访问类型过滤
  +----------------------------------------------------------------------
 */
 
@@ -27,6 +27,7 @@ class Admin extends Controller {
     public function _initialize() {
 		parent::_initialize();
 		$admin = Session::get('admin');
+
 		# 判断是否已经登录
 		if (empty($admin)) $this->redirect('login/index');
 		$this->assign('nice', $admin['m_nice']);
@@ -70,7 +71,7 @@ class Admin extends Controller {
 	 protected function get_menu($j_id){
 		 # 超级管理员
 		 if ($j_id == 0) {
-			 $list = Db::name('menu')->where('m_display = 1')->order('m_path ASC')->field('m_id,m_pid,m_name,m_controller,m_action,m_icon')->select();
+			 $list = Db::name('menu')->where('m_display = 1')->order('m_path ASC')->field('m_id,m_pid,m_name,m_controller,m_action,m_icon,m_request')->select();
 		 }else{
 			 # 先搜出对应的角色
 			 $role = Db::name('job')->where('j_id','=',$j_id)->field('r_id,j_name')->find();
@@ -90,7 +91,7 @@ class Admin extends Controller {
 			 }
 			 $menu = implode(',', $menu);
 			 # 使用菜单ID查询出对应的菜单
-			 $list = Db::name('menu')->where("(m_display = 1 AND m_id in({$menu})) OR (m_display = 1 AND m_type = 2)")->order('m_path ASC')->field('m_id,m_pid,m_name,m_controller,m_action,m_icon')->select();
+			 $list = Db::name('menu')->where("(m_display = 1 AND m_id in({$menu})) OR (m_display = 1 AND m_type = 2)")->order('m_path ASC')->field('m_id,m_pid,m_name,m_controller,m_action,m_icon,m_request')->select();
 		 }
 		 return $list;
 	 }
@@ -106,10 +107,25 @@ class Admin extends Controller {
 		$controller = strtolower( $Request->controller() );
 		$action     = strtolower( $Request->action() );
 		$status     = false;
-		# 验证
+		# 验证菜单权限
 		foreach ($menu as $v) {
 			if ($v['m_controller'] == $controller && $v['m_action'] == $action) {
 				$status = true;
+				# 验证请求类型
+				if (!empty($v['m_request'])) {
+					switch ($v['m_request']){
+						case 'GET':
+							if (!Request::instance()->isGet()) $mode = false;
+						break;  
+						case 'POST':
+							if (!Request::instance()->isPost()) $mode = false;
+						break;
+						case 'Ajax':
+							if (!Request::instance()->isAjax()) $mode = false;
+						break;
+					}
+					if (!$mode) $this->error('非法请求');
+				}
 				break;
 			}
 		}
@@ -159,5 +175,36 @@ class Admin extends Controller {
 		];
 		Db::name('manager_action_log')->insert($data);
 		if ($model) $this->error($title);
+	}
+
+	/**
+	 * 验证是否拥有地区访问权限
+	 * @param int $id 地区ID
+	 * @return bool
+	 */
+	protected function regionVif($id = ''){
+		if (empty($id)) return true;
+		$admin = Session::get('admin');
+		# 拥有全国权限 
+		if ($admin['m_nationwide'] == 1) return true;
+		# 判断是否拥有权限
+		$data = explode(',', $admin['m_province'].$admin['m_city'].$admin['m_area']);
+		if (in_array($id, $data)) return true;
+		return false;
+	}
+
+	/**
+	 * 拉取地区访问权限
+	 * @return bool|string
+	 */
+	protected function regionGet(){
+		$admin = Session::get('admin');
+		# 拥有全国权限 
+		if ($admin['m_nationwide'] == 1) return true;
+		return [
+			'province' => ltrim($admin['m_province'], ','),
+			'city'     => ltrim($admin['m_city'], ','),
+			'area'     => ltrim($admin['m_area'], ','),
+		];
 	}
 }

@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 操作日志
  + Author       : 小黄牛
- + Version      : V1.0.0.2
+ + Version      : V1.0.0.3
  + Initial-Time : 2017-09-28 14:19
- + Last-time    : 2017-09-28 14:19 + 小黄牛
- + Desc         : 添加操作日志记录
+ + Last-time    : 2017-10-09 10:21 + 小黄牛
+ + Desc         : 修复操作日志在详情页内点击清空后，返回上一页报错
  +----------------------------------------------------------------------
 */
 
@@ -69,6 +69,8 @@ class Actionlog extends Admin{
                ->where('A.mal_id', '=', $id)
                ->find();
 
+        if (!$info) $this->redirect('actionlog/showlist');
+        
         if ($info['j_id'] == 0) {
             $info['j_id'] = '超级管理员';
             $info['s_id'] = '总部';

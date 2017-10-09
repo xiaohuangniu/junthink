@@ -1,0 +1,130 @@
+{include file="index/head" /}
+<style>.job{height:30px; border:1px #ccc solid;color: #fff; margin:5px; float:left; text-align:center; line-height:20px; background:#009688; position:relative; padding:5px; cursor:pointer}</style>
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">管理员</legend>
+
+				<div class="layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li><a href="{:url('manager/showlist')}">管理员列表</a></li>
+						{if condition="$adminController->vif('manager','add')"}<li><a href="{:url('manager/add')}">新增管理员</a></li>{/if}
+						<li class="layui-this">详情预览</li>
+					</ul>
+				</div> 
+				
+				<div class="layui-field-box layui-form">
+					
+
+					<div class="bs-example">
+						<table class="table table-bordered">
+							<tbody>
+							<tr>
+								<th>昵称</th>
+								<th>
+									{$info.m_nice}								
+								</th>
+							</tr>
+							<tr>
+								<th>状态</th>
+								<th>
+									{switch $info.m_status}
+										{case 1} <font style="color: #009688">正常</font> {/case}
+										{case 2} <font style="color: red">禁用</font> {/case}
+									{/switch}							
+								</th>
+							</tr>
+							<tr>
+								<th>用户名</th>
+								<th>
+									{$info.m_name}						
+								</th>
+							</tr>
+
+							<tr>
+								<th width="150">所属组织</th>
+								<td>
+									{$info.s_id}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">所属岗位</th>
+								<td>
+									{$info.j_id}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">授权角色</th>
+								<td>
+									{$info.r_id}
+								</td>
+							</tr>
+
+							<tr>
+								<th>创建时间</th>
+								<td>
+									{$info.m_time|date="Y-m-d H:i:s",###}
+								</td>
+							</tr>
+							
+							<tr><th colspan="7" style="text-align: center">地区权限详情</th></tr>
+							
+							<tr>
+								<th>全国权限</th>
+								<td>
+									{eq name="$info.m_nationwide" value="1"}
+										<font style="color: #01AAED">是</font>
+									{else/}
+										<font style="color: red">否</font>
+									{/eq}
+								</td>
+							</tr>
+							
+							<tr>
+								<th width="150">省权限</th>
+								<td>
+									{volist name="province_ids" id="v"}
+										<div class="job">{$v.r_name}</div>
+									{/volist}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">市权限</th>
+								<td>
+									{volist name="city_ids" id="v"}
+										<div class="job">{$v.r_name}</div>
+									{/volist}
+								</td>
+							</tr>
+							<tr>
+								<th width="150">区权限</th>
+								<td>
+									{volist name="area_ids" id="v"}
+										<div class="job">{$v.r_name}</div>
+									{/volist}
+								</td>
+							</tr>
+							
+							</tbody>
+						</table>
+					</div>
+
+					
+				</div>
+			</fieldset>
+		</div>
+
+</body>
+<script>
+//Demo
+layui.use('form', function(){
+  var form = layui.form();
+  
+  //监听提交
+  form.on('submit(formDemo)', function(data){
+    layer.msg(JSON.stringify(data.field));
+    return false;
+  });
+});
+</script>
+</html>

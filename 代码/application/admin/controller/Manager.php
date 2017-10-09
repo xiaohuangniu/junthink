@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 管理员
  + Author       : 小黄牛
- + Version      : V1.0.0.2
+ + Version      : V1.0.0.3
  + Initial-Time : 2017-09-26 10:17
- + Last-time    : 2017-09-28 13:56 + 小黄牛
- + Desc         : 增加日志记录
+ + Last-time    : 2017-10-08 18:55 + 小黄牛
+ + Desc         : 新增管理员地区权限关联，新增管理员预览功能
  +----------------------------------------------------------------------
 */
 
@@ -92,6 +92,10 @@ class Manager extends Admin{
                 $phone  = Request::instance()->post('phone');
                 $status = Request::instance()->post('status');
                 $j_id   = Request::instance()->post('pid');
+				$nationwide   = Request::instance()->post('nationwide');
+				$province_ids = Request::instance()->post('province_ids');
+				$city_ids     = Request::instance()->post('city_ids');
+				$area_ids     = Request::instance()->post('area_ids');
                 
                 $DB     = Db::name('manager');
                 if ($DB->where('m_name','=',$name)->value('m_id')) {
@@ -114,8 +118,17 @@ class Manager extends Admin{
                     'm_phone'=> $phone,
                     'm_time' => $time,
                     'm_status' => $status,
-                    'j_id'   => $j_id,
+                    'j_id'     => $j_id,
+					'm_nationwide' => $nationwide ?: 0,
                 ];
+				
+				// 不是全国地区管理权限
+				if ($nationwide != 1) {
+					$data['m_province'] = $province_ids;
+					$data['m_city'] = $city_ids;
+					$data['m_area'] = $area_ids;
+				}
+				
                 $res    = $DB->insert($data);
                 if ($res) {
                     $this->addLog('新增管理员', '新增成功', 1, false);
@@ -156,6 +169,10 @@ class Manager extends Admin{
                 $phone  = Request::instance()->post('phone');
                 $status = Request::instance()->post('status');
                 $j_id   = Request::instance()->post('pid');
+				$nationwide   = Request::instance()->post('nationwide');
+				$province_ids = Request::instance()->post('province_ids');
+				$city_ids     = Request::instance()->post('city_ids');
+				$area_ids     = Request::instance()->post('area_ids');
                 
                 $DB     = Db::name('manager');
                 if ($name != $upd_name) {
@@ -184,7 +201,16 @@ class Manager extends Admin{
                     'm_time' => $time,
                     'm_status' => $status,
                     'j_id'   => $j_id,
+					'm_nationwide' => $nationwide ?: 0,
                 ];
+				
+				// 不是全国地区管理权限
+				if ($nationwide != 1) {
+					$data['m_province'] = $province_ids;
+					$data['m_city'] = $city_ids;
+					$data['m_area'] = $area_ids;
+				}
+				
                 $res    = $DB->where('m_id','=',$id)->update($data);
                 if ($res) {
                     $this->addLog('修改管理员', '修改成功', 1, false);
@@ -207,9 +233,57 @@ class Manager extends Admin{
                  $info['j_name'] = $res['j_name'];
                  $info['s_name'] = Db::name('structure')->where('s_id','=',$res['s_id'])->value('s_name');
             }
+			
+			$DB           = Db::name('region');
+			$province_ids = $DB->field('r_id, r_name')->where('r_id', 'in', $info['m_province'])->select();
+            $city_ids     = $DB->field('r_id, r_name')->where('r_id', 'in', $info['m_city'])->select();
+            $area_ids     = $DB->field('r_id, r_name')->where('r_id', 'in', $info['m_area'])->select();
+			
             $this->assign('info',$info);
+			$this->assign('province_ids', $province_ids);
+            $this->assign('city_ids', $city_ids);
+            $this->assign('area_ids', $area_ids);
 			return $this->fetch();
 		}
+    }
+	
+	/**
+     * 查询详情
+     */
+    public function details(){
+        $id= Request::instance()->param('id');
+        $info = Db::name('manager')
+               ->where('m_id', '=', $id)
+               ->find();
+
+        if ($info['j_id'] == 0) {
+            $info['j_id'] = '超级管理员';
+            $info['s_id'] = '总部';
+            $info['r_id'] = '无';
+        } else {
+           $job = Db::name('job')->field('j_name, s_id, r_id')->where('j_id', '=', $info['j_id'])->find();
+           $info['j_id'] = $job['j_name'];
+           $structure = Db::name('structure')->where('s_id', '=', $job['s_id'])->value('s_name');
+           $info['s_id'] = $structure;
+           $role = Db::name('role')->field('r_name')->where('r_id in('.$job['r_id'].')')->select();
+           $txt  = '';
+           foreach ($role as $v) {
+               $txt .= '<font style="color: #2F4056">'.$v['r_name'].'</font><br/>';
+           }
+           $info['r_id'] = $txt;
+        }
+        $this->assign('info', $info);
+		
+		$DB           = Db::name('region');
+		$province_ids = $DB->field('r_id, r_name')->where('r_id', 'in', $info['m_province'])->select();
+		$city_ids     = $DB->field('r_id, r_name')->where('r_id', 'in', $info['m_city'])->select();
+		$area_ids     = $DB->field('r_id, r_name')->where('r_id', 'in', $info['m_area'])->select();
+		
+		$this->assign('province_ids', $province_ids);
+		$this->assign('city_ids', $city_ids);
+		$this->assign('area_ids', $area_ids);
+		
+        return $this->fetch();
     }
 
     /**

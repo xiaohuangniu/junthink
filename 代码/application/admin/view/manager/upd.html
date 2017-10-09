@@ -1,8 +1,9 @@
 {include file="index/head" /}
+{include file="manager/jscss" /}
 
 		<div class="admin-main">
 
-			<fieldset class="layui-elem-field">
+			<fieldset class="layui-elem-field" style="border-bottom: 0px;">
 				<legend style="width: 100px">管理员</legend>
 
 				<div class="layui-tab-brief" lay-filter="docDemoTabBrief">
@@ -73,8 +74,38 @@
 						</div>
 					</div>
 					
+					<div class="layui-form-item" id="q-1">
+						<label class="layui-form-label" style="width: 100px">管辖区域:</label>
+						<div class="layui-input-block">
+							<style>.layui-form-switch{width:55px}.layui-form-switch{float: left}#myModal2 .layui-btn-normal {height: 22px;line-height: 22px;padding: 0px 10px;margin-top: 5px;}</style>
+							<input type="checkbox" lay-skin="switch" lay-text="开|关" lay-filter="all_region_status" value="1" {$info.m_nationwide?='checked'}>
+							<span style="display: block;width: 40px;float: left;margin-left: 10px;margin-top: 8px;">全国</span>
+							<button type="button" class="layui-btn layui-btn-normal" id="open2" style=" {$info.m_nationwide?='display: none;'} height: 30px;line-height: 30px;">选择区域</button>
+						</div>
+					</div>
+					
+					<div class="layui-form-item" id="q-2">
+						<label class="layui-form-label" style="width: 120px">已管辖区域:</label>
+						<div class="layui-input-block" id="my_area_list">
+							{volist name="province_ids" id="v"}
+								<div class="job" id="{$v.r_id}" name="1">{$v.r_name}<img src="{:__PUBLIC__}/img/close.gif" onclick="remove_area(this)"/></div>
+							{/volist}
+							{volist name="city_ids" id="v"}
+								<div class="job" id="{$v.r_id}" name="2">{$v.r_name}<img src="{:__PUBLIC__}/img/close.gif" onclick="remove_area(this)"/></div>
+							{/volist}
+							{volist name="area_ids" id="v"}
+								<div class="job" id="{$v.r_id}" name="3">{$v.r_name}<img src="{:__PUBLIC__}/img/close.gif" onclick="remove_area(this)"/></div>
+							{/volist}
+						</div>
+					</div>
+					
 
 					<input type="hidden" id="pid" value="{$info.j_id}">
+					<input type="hidden" id="quanguo" value="{$info.m_nationwide}">
+					<input type="hidden" id="province_ids" value="{$info.m_province}" />
+					<input type="hidden" id="city_ids" value="{$info.m_city}" />
+					<input type="hidden" id="area_ids" value="{$info.m_area}" />
+					
 					
 					<div class="layui-form-item">
 						<div class="layui-input-block">
@@ -89,9 +120,41 @@
 			</div>
 		</div>
 
+<div id="mdialog2" style="display:none;padding: 15px;"> 
+	<table>
+		<tr><td colspan="2" style="padding-bottom:15px"><font color="red">说明：如果添加了省份，表示可以管辖该省份下包括的省级、市级和区级，如果添加市级表示可以管辖该市的市级和区域，如果添加区域只能管辖改区域级</font></td></tr>
+		<tr style="height: 60px;"><td>选择加载区域：</td><td>
+			<select name="province" id="province_list" onchange="getCity(this.value);" style="height: 30px;"><option value="1">选择省份</option></select>
+			<select name="region" id="region_list" onchange="getArea(this.value);" style="height: 30px;"><option value="">选择城市</option></select>
+		</td></tr>
+		<tr><td width="100px">确认添加区域：</td><td id="area_list">
+			</td></tr>
+	</table>
+</div>
+
 <script type="text/javascript">
 layui.use(['form','tree', 'layer'], function(){
 	var layer = layui.layer,$ = layui.jquery, form = layui.form(); 
+	// 切换全国管理权限
+	form.on("switch(all_region_status)", function(data){
+		var value = this.checked ? true : false;
+		if(value == true){
+			$('.layui-btn-normal').css('display','none');
+			$('#quanguo').val(1);
+		}else{
+			$('.layui-btn-normal').css('display','block');
+			$('#quanguo').val('');
+		}
+	}); 
+	// 打开选择区域
+	$("#open2").click(function(){
+		layer.open({
+			type: 1, 
+			area: ['620px', '440px'], //宽高
+			content: $('#mdialog2')
+		});
+	});
+	
 	form.on('radio(type)', function(data){
 		if (data.value == 1 ){
 			$('.gw').css('display', 'none');
@@ -148,12 +211,16 @@ $("#upd_btn").click(function(){
 	var phone  = $('#phone').val();
 	var type   = $('input[name="type"]:checked').val();
 	var status = $('input[name="status"]:checked').val();
-
+	var quanguo      = $('#quanguo').val();		// 是否拥有全国权限
+	var province_ids = $('#province_ids').val();// 省级权限
+	var city_ids     = $('#city_ids').val();	// 市级权限
+	var area_ids     = $('#area_ids').val();	// 区级权限
+	
 	// 精确判断可自行添加
 	if (name == '' || pwd == '') {return false;}
 
 	if (type == 1) {pid = 0;} // 将岗位ID改为超级管理员
-	var data   = {'id':'{$info.m_id}', 'upd_name':'{$info.m_name}', 'upd_jid':'{$info.j_id}', 'nice':nice, 'name':name, 'pwd':pwd, 'pid':pid, 'phone':phone, 'status':status, 'type':2};
+	var data   = {'id':'{$info.m_id}', 'upd_name':'{$info.m_name}', 'upd_jid':'{$info.j_id}', 'nice':nice, 'name':name, 'pwd':pwd, 'pid':pid, 'phone':phone, 'status':status, 'nationwide':quanguo, 'province_ids':province_ids, 'city_ids':city_ids, 'area_ids':area_ids, 'type':2};
 
 	$.ajax({
 		type: 'post',

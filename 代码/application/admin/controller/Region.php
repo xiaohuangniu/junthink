@@ -39,9 +39,11 @@ class Region extends Admin{
             # 获取一级省
             $list = $this->DB->where('r_pid = 1')->select();
             $this->assign('list', $list);
+
             # 获取所有地区节点
             $list = $this->DB->field('r_id as id, r_name as name,  r_pid as pid')->select();
-            $this->assign('json', json_encode( unlimitedForLayer($list)) );
+            $this->assign('json', json_encode(unlimitedForLayer($list)) );
+
             return $this->fetch();
         }
     }
