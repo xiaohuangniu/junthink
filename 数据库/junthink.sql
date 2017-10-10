@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50553
 File Encoding         : 65001
 
-Date: 2017-10-09 10:59:49
+Date: 2017-10-10 08:40:57
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -77,12 +77,12 @@ CREATE TABLE `jun_manager_action_log` (
   PRIMARY KEY (`mal_id`),
   KEY `m_id` (`m_id`),
   KEY `mal_type` (`mal_type`)
-) ENGINE=MyISAM AUTO_INCREMENT=75 DEFAULT CHARSET=utf8 COMMENT='管理员操作日志';
+) ENGINE=MyISAM AUTO_INCREMENT=201 DEFAULT CHARSET=utf8 COMMENT='管理员操作日志';
 
 -- ----------------------------
 -- Records of jun_manager_action_log
 -- ----------------------------
-INSERT INTO `jun_manager_action_log` VALUES ('74', '9', '清空操作日志', '清空成功', '1', 'GET', '127.0.0.1', '/tp5/admin.php/actionlog/emptyall.html', '1507517889');
+INSERT INTO `jun_manager_action_log` VALUES ('200', '3', '清空操作日志', '清空成功', '1', 'GET', '127.0.0.1', '/tp5/admin.php/actionlog/emptyall.html', '1507595463');
 
 -- ----------------------------
 -- Table structure for jun_manager_login_log
@@ -95,11 +95,12 @@ CREATE TABLE `jun_manager_login_log` (
   `l_time` int(10) DEFAULT NULL COMMENT '登录时间',
   PRIMARY KEY (`l_id`),
   KEY `m_id` (`m_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='管理登录日志表';
+) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8 COMMENT='管理登录日志表';
 
 -- ----------------------------
 -- Records of jun_manager_login_log
 -- ----------------------------
+INSERT INTO `jun_manager_login_log` VALUES ('13', '3', '127.0.0.1', '1507594987');
 
 -- ----------------------------
 -- Table structure for jun_menu
@@ -119,7 +120,7 @@ CREATE TABLE `jun_menu` (
   `m_sort` int(11) DEFAULT '0' COMMENT '排序',
   `m_request` varchar(6) DEFAULT NULL COMMENT '请求方式，GET,POST,AJAX',
   PRIMARY KEY (`m_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=48 DEFAULT CHARSET=utf8 COMMENT='菜单表';
+) ENGINE=MyISAM AUTO_INCREMENT=57 DEFAULT CHARSET=utf8 COMMENT='菜单表';
 
 -- ----------------------------
 -- Records of jun_menu
@@ -165,6 +166,15 @@ INSERT INTO `jun_menu` VALUES ('44', '42', '数据库备份', 'database', 'backu
 INSERT INTO `jun_menu` VALUES ('45', '42', '下载备份', 'database', 'download', '32/41/42/45', '1', '1', '', '', '0', '0');
 INSERT INTO `jun_menu` VALUES ('46', '42', '备份还原', 'database', 'restore', '32/41/42/46', '1', '1', '', '', '0', '0');
 INSERT INTO `jun_menu` VALUES ('47', '28', '详情预览', 'manager', 'details', '6/7/28/47', '1', '1', null, '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('48', '0', '插件设置', '', '', '48', '1', '1', null, '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('49', '48', '插件管理', '', '', '48/49', '1', '1', 'fa fa-tasks', '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('50', '49', '插件列表', 'plughook', 'showlist', '48/49/50', '1', '1', null, '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('51', '49', '新增插件', 'plughook', 'add', '48/49/51', '1', '1', '', '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('52', '50', '删除插件', 'plughook', 'del', '48/49/50/52', '1', '1', null, '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('53', '50', '安装插件', 'plughook', 'install', '48/49/50/53', '1', '1', null, '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('54', '50', '卸载插件', 'plughook', 'uninstall', '48/49/50/54', '1', '1', null, '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('55', '50', '禁用插件', 'plughook', 'disable', '48/49/50/55', '1', '1', null, '', '0', '0');
+INSERT INTO `jun_menu` VALUES ('56', '50', '启用插件', 'plughook', 'enable', '48/49/50/56', '1', '1', null, '', '0', '0');
 
 -- ----------------------------
 -- Table structure for jun_region
@@ -3557,7 +3567,7 @@ CREATE TABLE `jun_role` (
 -- Records of jun_role
 -- ----------------------------
 INSERT INTO `jun_role` VALUES ('10', '完全权限', '', '1', '6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,47,32,33,34,35,37,38,39,40,41,42,43,44,45,46');
-INSERT INTO `jun_role` VALUES ('11', '局部权限', '用作测试', '1', '6,7,8,9,12,13,16,17,20,21,24,25,28,47,32,33,34,35,37,38,39,40,41,42,43,44,45,46');
+INSERT INTO `jun_role` VALUES ('11', '局部权限', '用作测试', '1', '6,7,8,9,12,13,16,17,20,21,24,25,28,47,32,33,34,35,37,38,39,40,41,42,43,44,45,46,48,49,50,52,53,54,55,56,51');
 
 -- ----------------------------
 -- Table structure for jun_structure

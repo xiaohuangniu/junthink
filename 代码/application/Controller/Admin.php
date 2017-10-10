@@ -3,10 +3,10 @@
  +----------------------------------------------------------------------
  + Title        : 后台 - 中间件
  + Author       : 小黄牛
- + Version      : V1.0.0.3
+ + Version      : V1.0.0.4
  + Initial-Time : 2017-09-21 14:39
- + Last-time    : 2017-10-09 10:32 + 小黄牛
- + Desc         : 新增地区权限验证方法、新增菜单访问类型过滤
+ + Last-time    : 2017-10-09 16:37 + 小黄牛
+ + Desc         : 新增插件监听
  +----------------------------------------------------------------------
 */
 
@@ -17,6 +17,7 @@ use think\Controller;
 use think\Db;
 use think\Request;
 use think\Session;
+use hooks\Hooks;
 
 class Admin extends Controller {
 	private $menu_vif; // 权限菜单
@@ -30,6 +31,10 @@ class Admin extends Controller {
 
 		# 判断是否已经登录
 		if (empty($admin)) $this->redirect('login/index');
+		# 启动插件监听
+		$hooks = new Hooks();
+		$hooks->hook();
+
 		$this->assign('nice', $admin['m_nice']);
 
 		# 设置公共权限

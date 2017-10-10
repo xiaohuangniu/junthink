@@ -1,0 +1,115 @@
+{include file="index/head" /}
+<link rel="stylesheet" type="text/css" href="{:__PUBLIC__}/hook/css/module.css">
+<link rel="stylesheet" type="text/css" href="{:__PUBLIC__}/hook/css/style.css" media="all">
+<style>.layui-form-switch{width: 55px}#submit{margin-top: 20px}.text{height: 35px;padding-left:10px;background: #f6f6f6;}.textarea textarea,.textarea{background: #f6f6f6}</style>
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">插件管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						{if condition="$adminController->vif('plughook','showlist')"}<li><a href="{:url('plughook/showlist')}">插件列表</a></li>{/if}
+						<li class="layui-this"><a href="{:url('plughook/add')}">新增插件</a></li>
+					</ul>
+				</div> 
+
+				<div class="layui-field-box layui-form">
+					<!-- 表单 -->
+					<form class="form-horizontal doc-modal-form">
+						<div class="form-item">
+							<label class="item-label"><span class="must">*</span>插件名 <span class="check-tips">（也是插件的目录名,唯一）</span></label>
+							<div class="controls">
+								<input type="text" class="text input-large" id="name" value="">
+							</div>
+						</div>
+						<div class="form-item">
+							<label class="item-label">钩子名<span class="check-tips">（请输入钩子名,唯一，例如：shop）</span></label>
+							<div class="controls">
+								<input type="text" class="text input-large" id="hook" value="">
+							</div>
+						</div>
+						<div class="form-item">
+							<label class="item-label">插件别名<span class="check-tips">（例如：我是一个插件）</span></label>
+							<div class="controls">
+								<input type="text" class="text input-large" id="title" value="">
+							</div>
+						</div>
+						<div class="form-item">
+							<label class="item-label">版本<span class="check-tips">（请输入插件版本）</span></label>
+							<div class="controls">
+								<input type="text" class="text input-large" id="edition" value="V1.0">
+							</div>
+						</div>
+						<div class="form-item">
+							<label class="item-label">作者<span class="check-tips">（请输入插件作者）</span></label>
+							<div class="controls">
+								<input type="text" class="text input-large" id="author" value="JunThink官方">
+							</div>
+						</div>
+						<div class="form-item">
+							<label class="item-label">描述<span class="check-tips">（请输入描述）</span></label>
+							<div class="controls">
+								<label class="textarea input-large">
+									<textarea id="content">这是一个测试描述</textarea>
+								</label>
+							</div>
+						</div>
+						<div class="form-item">
+							<label class="item-label">是否需要安装</label>
+							<div class="controls">
+								<input type="checkbox" name="install" id="install" lay-skin="switch" value="1" lay-text="是|否" checked>
+							</div>
+						</div>
+						<div class="form-item">
+							<label class="item-label">是否需要配置</label>
+							<div class="controls">
+								<input type="checkbox" name="peizhi" id="peizhi" lay-skin="switch" value="1" lay-text="是|否" checked>
+							</div>
+						</div>
+
+						
+						<div class="form-item">
+							<button type="button" class="layui-btn layui-btn-normal" id="submit">确 定</button>
+						</div>
+					</form>
+				</div>
+			</fieldset>
+		</div>
+<script type="text/javascript">
+layui.use(['form', 'layedit', 'laydate'], function() {
+	var form = layui.form(),layer = layui.layer;
+	$("#submit").click(function(){
+		var name    = $('#name').val();
+		var hook    = $('#hook').val();
+		var title   = $('#title').val();
+		var edition = $('#edition').val();
+		var author  = $('#author').val();
+		var content = $('#content').val();
+		if (name == '' || hook == '' || title == '' || edition == '' || author == '') return false;
+		// 选中安装
+		if ($('#install').is(':checked')) {var install = 1;}else{var install = 2}
+		// 选中配置
+		if ($('#peizhi').is(':checked')) {var peizhi = 1;}else{var peizhi = 2}
+		var data = {'name':name, 'hook':hook, 'title':title, 'edition':edition, 'author':author, 'content':content, 'install':install, 'peizhi':peizhi};
+
+		$.ajax({
+			type: 'post',
+			data:data,
+			url: "{:url('plughook/add')}",
+			success: function(data) {
+				var array = $.parseJSON(data);
+				if(array.code == '01'){
+					layer.tips(array.msg, '#submit', {tips: [4, 'red']});
+				}else{
+					layer.tips(array.msg, '#submit', {tips: [2, '#78BA32']});
+					setTimeout(function(){window.location.reload();},1000); 
+				}
+			}
+		});
+	});
+});
+</script>
+
+</body>
+</html>

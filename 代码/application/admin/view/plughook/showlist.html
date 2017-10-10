@@ -1,0 +1,100 @@
+{include file="index/head" /}
+<link rel="stylesheet" type="text/css" href="{:__PUBLIC__}/hook/css/module.css">
+<link rel="stylesheet" type="text/css" href="{:__PUBLIC__}/hook/css/style.css" media="all">
+<style>.layui-form-switch{width: 55px}#submit{margin-top: 20px}.text{height: 35px;padding-left:10px;background: #f6f6f6;}.textarea textarea,.textarea{background: #f6f6f6}.layui-field-box{padding: 0}</style>
+		<div class="admin-main">
+
+			<fieldset class="layui-elem-field">
+				<legend style="width: 100px">插件管理</legend>
+
+				<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+					<ul class="layui-tab-title">
+						<li class="layui-this"><a href="{:url('plughook/showlist')}">插件列表</a></li>
+						{if condition="$adminController->vif('plughook','add')"}<li><a href="{:url('plughook/add')}">新增插件</a></li>{/if}
+					</ul>
+				</div> 
+
+				<div class="layui-field-box layui-form">
+					<!-- 内容区 -->
+					<div id="main" class="main"><div class="data-table table-striped">
+						<table>
+							<thead>
+								<tr>
+									<th width="120px">插件名</th>
+									<th width="120px">钩子名</th>
+									<th width="200px">插件别名</th>
+									<th>描述</th>
+									<th width="73px">状态</th>
+									<th width="53px">安装</th>
+									<th width="120px">作者</th>
+									<th width="43px">版本</th>
+									<th width="170px">时间</th>
+									<th width="150px">操作</th>
+								</tr>
+							</thead>
+							<tbody>
+								{volist name="list" id="k"}
+								<tr>
+									<td>{$k.name}</td>
+									<td>{$k.hook}</td>
+									<td>{$k.title}</td>
+									<td>{$k.content}</td>
+									<td width="43px">
+										{if condition="$k['install'] == 1"}
+											{switch $k.type}
+												{case 1}未安装{/case}
+												{case 2}启用{/case}
+												{case 3}禁用{/case}
+											{/switch}
+										{else /}
+											无需安装
+										{/if}	
+									</td><!--状态-->
+									<td width="43px">
+										{if condition="$k['install'] == 1"}
+											Yes
+										{else /}
+											No
+										{/if}
+									</td><!--是否需要安装-->
+									<td>{$k.author}</td>
+									<td width="43px">{$k.edition}</td>
+									<td>{$k.time}</td>
+									<td>
+										{if condition="$k['install'] == 1"}
+											{switch $k.type}
+												{case 1}
+													{if condition="$adminController->vif('plughook','install')"}<a class="layui-btn layui-btn-normal layui-btn-mini" href="install/name/{$k.name}/hooks/{$k.hook}">安装</a>{/if}
+												{/case}
+												{case 2}
+													{if condition="$adminController->vif('plughook','disable')"}<a class="layui-btn layui-btn-mini" href="disable/name/{$k.name}">禁用</a>{/if}
+													{if condition="$adminController->vif('plughook','uninstall')"}<a class="layui-btn layui-btn-danger layui-btn-mini" href="uninstall/name/{$k.name}/hooks/{$k.hook}">卸载</a>{/if}
+												{/case}
+												{case 3}
+													{if condition="$adminController->vif('plughook','enable')"}<a class="layui-btn layui-btn-danger layui-btn-mini" href="enable/name/{$k.name}">启用</a>{/if}
+												{/case}
+											{/switch}
+										{else /}
+											<span style="margin-right: 20px">NO</span>
+										{/if}	
+										
+										{if condition="$adminController->vif('plughook','del')"}<a class="layui-btn layui-btn-mini" href="del/name/{$k.name}">删除</a>{/if}
+									</td>
+								</tr>	
+								{/volist}						
+							</tbody>
+						</table>
+					</div></div>
+
+				<!-- 数据列表 -->
+				</div>
+			</fieldset>
+		</div>
+<script type="text/javascript">
+layui.use(['form', 'layedit', 'laydate'], function() {
+	var form = layui.form(),layer = layui.layer;
+});
+</script>
+
+</body>
+</html>
