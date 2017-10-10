@@ -78,7 +78,7 @@
 											<span style="margin-right: 20px">NO</span>
 										{/if}	
 										
-										{if condition="$adminController->vif('plughook','del')"}<a class="layui-btn layui-btn-mini" href="del/name/{$k.name}">删除</a>{/if}
+										{if condition="$adminController->vif('plughook','del')"}<a class="layui-btn layui-btn-mini" href="del/name/{$k.name}/hooks/{$k.hook}">删除</a>{/if}
 									</td>
 								</tr>	
 								{/volist}						

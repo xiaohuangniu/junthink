@@ -35,10 +35,14 @@ class Plughook extends Admin{
         # SB tp框架，debug就是报错，找不到原因，暂时关闭警告提示
         error_reporting(E_ALL^E_NOTICE^E_WARNING);
         $name  = Request::instance()->param('name');
+        $hook  = Request::instance()->param('hooks');
         $hooks = new Hooks();
-        $dir   = $hooks->root_dir . $name . '/';
-        $res   = $hooks->delHook($dir);
-        if ($res) $this->addLog('删除插件', '删除成功', 1);
+        $res   = $hooks->uninstallHook($name, $hook);
+        if ($res) {
+            $dir   = $hooks->root_dir . $name . '/';
+            $res   = $hooks->delHook($dir);
+            if ($res) $this->addLog('删除插件', '删除成功', 1);
+        }
         $this->addLog('删除插件', '删除失败', 2);
     }
 
