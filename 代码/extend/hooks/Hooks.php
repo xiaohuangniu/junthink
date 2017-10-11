@@ -163,10 +163,10 @@ class Hooks {
                 $method = $listener[1]; 
                 if (method_exists($class,$method)) { 
 					if(empty($type)){
-                   		$result .= $class->$method($data); 
+                   		return $class->$method($data); 
 					}else{
 						// 动态调用插件的方法 
-                    	$result .= $class->$type($data); 
+                    	return $class->$type($data); 
 					}
                 } 
             } 
